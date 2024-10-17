@@ -1,7 +1,17 @@
-import React from "react";
+import { ReactNode } from "react";
+import Sidebar from "../components/Sidebar";
 
-const Layout = () => {
-  return <div>Layout</div>;
+interface LayoutProps {
+  children: ReactNode;
+}
+
+const Layout = ({ children }: LayoutProps) => {
+  return (
+    <div>
+      <Sidebar />
+      {children}
+    </div>
+  );
 };
 
 export default Layout;
