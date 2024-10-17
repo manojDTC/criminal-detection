@@ -8,6 +8,8 @@ import {
 import Login from "./components/Login";
 import Dashboard from "./components/Dashboard";
 import Layout from "./layout/Layout";
+import Header from "./components/Header";
+import Live from "./components/Live";
 
 const AppRoutes = () => {
   return (
@@ -25,15 +27,12 @@ const AppRoutes = () => {
             }
           />
           <Route
-            path="/project"
-            // element={
-            //   <VisionStudioLayout>
-            //     <ProjectImagesProvider>
-            //       <VisionStudioModal />
-            //       <Project />
-            //     </ProjectImagesProvider>
-            //   </VisionStudioLayout>
-            // }
+            path="/livefeed"
+            element={
+              <Layout>
+                <Live />
+              </Layout>
+            }
           />
           <Route
             path="/upload/:id"
