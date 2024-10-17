@@ -58,7 +58,7 @@
   padding-top: 10px;
 }
 .login-right {
-  /* background-image: url("./images/login/signin-bg.png"); */
+  background-image: url("./assets/signbg.png");
   background-repeat: no-repeat;
   background-size: cover;
   justify-content: center;

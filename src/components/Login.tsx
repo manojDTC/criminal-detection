@@ -1,4 +1,6 @@
 import React from "react";
+import unifynow from "../assets/unifynow.png";
+import digitalwp from "../assets/digitalwp.png";
 
 const Login = () => {
   return (
@@ -7,11 +9,7 @@ const Login = () => {
         <div className="col-md-6">
           <div className="registration-form">
             <div className="unify-logo">
-              <img
-                src="./images/login/unifynow-logo.png"
-                alt="unifynow-logo"
-                className="img-fluid"
-              />
+              <img src={unifynow} alt="unifynow-logo" className="img-fluid" />
             </div>
 
             <div id="signin">
@@ -84,13 +82,8 @@ const Login = () => {
         </div>
         <div className="col-md-6">
           <div className="login-right">
-            <div>
-              <p>Your Gateway to AI-Powered Workplace Solutions</p>
-              <img
-                src="./images/login/companyLogos.png"
-                alt="productlogos"
-                className="img-fluid"
-              />
+            <div style={{ display: "flex", alignItems: "center" }}>
+              <img src={digitalwp} alt="productlogos" className="img-fluid" />
             </div>
           </div>
         </div>
