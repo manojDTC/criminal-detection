@@ -1,10 +1,42 @@
-import React from "react";
+import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { toast, ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css"; // Import toastify styles
 import unifynow from "../assets/unifynow.png";
 import digitalwp from "../assets/digitalwp.png";
 
-const Login = () => {
+const Login: React.FC = () => {
+  const [email, setEmail] = useState<string>("");
+  const [password, setPassword] = useState<string>("");
+  const navigate = useNavigate();
+
+  const handleLogin = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+
+    // Hardcoded credentials
+    const hardcodedEmail = "user@dtc.com";
+    const hardcodedPassword = "Test@123";
+
+    if (email === hardcodedEmail && password === hardcodedPassword) {
+      // Redirect to /dashboard on successful login
+      navigate("/dashboard");
+    } else {
+      // Show toaster message for failed login
+      toast.error("Invalid email or password", {
+        position: "top-right",
+        autoClose: 3000,
+        hideProgressBar: true,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+      });
+    }
+  };
+
   return (
     <div className="vi-login">
+      <ToastContainer /> {/* Container for toaster notifications */}
       <div className="row align-items-center" style={{ height: "100vh" }}>
         <div className="col-md-6">
           <div className="registration-form">
@@ -14,7 +46,10 @@ const Login = () => {
 
             <div id="signin">
               <div>
-                <form action="" className="d-flex gap-3 flex-column login-form">
+                <form
+                  onSubmit={handleLogin}
+                  className="d-flex gap-3 flex-column login-form"
+                >
                   <div className="form-group">
                     <label htmlFor="email" className="form-label">
                       Email
@@ -24,6 +59,8 @@ const Login = () => {
                       className="form-control"
                       id="email"
                       placeholder="Enter email"
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
                       name="email"
                     />
                   </div>
@@ -36,6 +73,8 @@ const Login = () => {
                       className="form-control"
                       id="pwd"
                       placeholder="Enter password"
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
                       name="pswd"
                     />
                     <div className="remember-pw">
@@ -51,15 +90,9 @@ const Login = () => {
                           className="form-label"
                           style={{ fontSize: "14px" }}
                         >
-                          Remeber Password
+                          Remember Password
                         </label>
                       </div>
-                      <a
-                        href="./forgotPassword.html"
-                        className="forgot-password"
-                      >
-                        Forgot Password?
-                      </a>
                     </div>
                   </div>
 
@@ -69,13 +102,6 @@ const Login = () => {
                     </button>
                   </div>
                 </form>
-
-                <div className="signin-up">
-                  <p>
-                    Do not have an Account?{" "}
-                    <a href="./SignUP.html">Create One</a>
-                  </p>
-                </div>
               </div>
             </div>
           </div>

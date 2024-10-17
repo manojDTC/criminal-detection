@@ -1,7 +1,11 @@
-import React from "react";
+import EmployeeDB from "./EmployeeDB";
 
 const Dashboard = () => {
-  return <div>Test 123</div>;
+  return (
+    <>
+      <EmployeeDB />
+    </>
+  );
 };
 
 export default Dashboard;
