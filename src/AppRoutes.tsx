@@ -1,6 +1,8 @@
 import React from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Login from "./components/Login";
+import Dashboard from "./components/Dashboard";
+import Layout from "./layout/Layout";
 
 const AppRoutes = () => {
   return (
@@ -8,14 +10,7 @@ const AppRoutes = () => {
       <Router>
         <Routes>
           <Route path="/auth" element={<Login />} />
-          <Route
-            path="/"
-            // element={
-            //   <VisionStudioLayout>
-            //     <HomePage />
-            //   </VisionStudioLayout>
-            // }
-          />
+          <Route path="/" element={<Dashboard />} />
           <Route
             path="/project"
             // element={
