@@ -13,6 +13,8 @@
   }
 }
 
+@import "@fontsource/inter/400.css";
+@import "@fontsource/inter/700.css";
 .App-header {
   background-color: #282c34;
   min-height: 100vh;
@@ -26,6 +28,9 @@
 
 .App-link {
   color: #61dafb;
+}
+body {
+  font-family: "Inter";
 }
 
 @keyframes App-logo-spin {
@@ -259,4 +264,35 @@
 .sidemenu li p {
   margin: 0;
   font-size: 12px;
+}
+.dbtable {
+  width: 100%;
+  text-align: center;
+  background: white;
+  padding: 10px;
+  border-radius: 6px;
+  border-collapse: collapse;
+  border: 2px solid white;
+  table-layout: fixed;
+}
+.dbtable th,
+.dbtable td {
+  padding: 14px;
+  color: #000000;
+  overflow-wrap: anywhere;
+}
+.criminaltable th,
+.criminaltable td {
+  padding: 0px;
+  font-size: 14px;
+}
+
+.dbtable tr:nth-child(even) {
+  background-color: #8080800f;
+}
+.dbtable tr {
+  height: 60px;
+}
+.criminaltable tr {
+  height: 40px;
 }

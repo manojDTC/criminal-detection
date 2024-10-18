@@ -8,8 +8,9 @@ import {
 import Login from "./components/Login";
 import Dashboard from "./components/Dashboard";
 import Layout from "./layout/Layout";
-import Header from "./components/Header";
 import Live from "./components/Live";
+import TimeLine from "./components/TimeLine";
+import History from "./components/History";
 
 const AppRoutes = () => {
   return (
@@ -35,17 +36,20 @@ const AppRoutes = () => {
             }
           />
           <Route
-            path="/upload/:id"
-            // element={
-            //   <VisionStudioLayout>
-            //     <ProjectImagesProvider>
-            //       <TrainProvider>
-            //         <VisionStudioModal />
-            //         <UploadPage />
-            //       </TrainProvider>
-            //     </ProjectImagesProvider>
-            //   </VisionStudioLayout>
-            // }
+            path="/timeline"
+            element={
+              <Layout>
+                <TimeLine />
+              </Layout>
+            }
+          />
+          <Route
+            path="/history"
+            element={
+              <Layout>
+                <History />
+              </Layout>
+            }
           />
         </Routes>
       </Router>
