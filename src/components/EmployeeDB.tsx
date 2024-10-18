@@ -10,24 +10,17 @@ const EmployeeDB = () => {
   const items = [
     {
       key: "1",
-      label: "Google",
+      label: "Employee List",
       children: (
         <div className="text-xl">
-          <p>
-            Lorem Ipsum is simply dummy text of the printing and typesetting
-          </p>
+          <p>Employee List will be displayed here</p>
         </div>
       ),
     },
     {
       key: "3",
-      label: <p>Twitter</p>,
-      children: (
-        <div>
-          "There is no one who loves pain itself, who seeks after it and wants
-          to have it, simply because it is pain..."
-        </div>
-      ),
+      label: <p style={{ marginLeft: "10px" }}>Criminal List</p>,
+      children: <div>Criminal list will be shown here</div>,
     },
   ];
   return (
