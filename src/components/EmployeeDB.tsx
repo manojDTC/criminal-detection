@@ -26,21 +26,22 @@ const EmployeeDB = () => {
   const [criminals, setCriminal] = useState<Criminal[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
+  const [key, setKey] = useState<string | null>("1");
   const employeeList: Employee[] = [
     {
       employeeName: "Sukanya Devi",
-      gender: "she tells female",
-      employeeId: 444,
-      role: "Dabba Fellow",
+      gender: "Female",
+      employeeId: 4434,
+      role: "Employee",
       cameraName: "test1",
       totalImages: 840,
       imageUrl: "",
     },
     {
       employeeName: "Sukanya Devi",
-      gender: "she tells female",
+      gender: "Female",
       employeeId: 444,
-      role: "Dabba Fellow",
+      role: "Employee",
       cameraName: "test1",
       totalImages: 840,
       imageUrl: "",
@@ -67,7 +68,6 @@ const EmployeeDB = () => {
     },
   ];
   useEffect(() => {
-    // Fetch employee list on component mount
     const fetchEmployees = async () => {
       try {
         // const response = await axios.get<Employee[]>(
@@ -82,8 +82,8 @@ const EmployeeDB = () => {
         setLoading(false);
       }
     };
-
     fetchEmployees();
+        
     const fetchCriminals = async () => {
       try {
         // const response = await axios.get<Criminal[]>(
@@ -98,9 +98,15 @@ const EmployeeDB = () => {
         setLoading(false);
       }
     };
-
-    fetchCriminals();
-  }, []);
+    
+    if (key === "1") {
+      fetchEmployees();
+    }
+    
+    if(key==="2"){
+          fetchCriminals();
+    }
+  }, [key]);
 
   if (loading) {
     return <div>Loading...</div>;
@@ -110,8 +116,8 @@ const EmployeeDB = () => {
     return <div>{error}</div>;
   }
 
-  const callback = (key: number) => {
-    console.log(key);
+  const callback = (key: string) => {
+    setKey(key);
   };
 
   const items = [
@@ -151,7 +157,7 @@ const EmployeeDB = () => {
       ),
     },
     {
-      key: "3",
+      key: "2",
       label: (
         <p style={{ marginLeft: "10px", fontSize: "16px" }}>Criminal List</p>
       ),
@@ -228,7 +234,7 @@ const EmployeeDB = () => {
         items={items}
         defaultActiveKey="1"
         //className="md:w-[70%] w-full mx-auto p-2 border-0"
-        //onChange={callback}
+        onChange={callback}
         style={{ color: "black" }}
       />
     </div>
