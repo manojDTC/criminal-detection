@@ -1,4 +1,3 @@
-import React from "react";
 import image from "../assets/image 19.png";
 import image1 from "../assets/image 20.png";
 import cap from "../assets/cap.png";
@@ -120,7 +119,7 @@ const Live = () => {
             }}
           >
             <p>Live Feed</p>
-            <iframe src="" style={{ width: "100%" }}></iframe>
+            <iframe title="live feed" src="" style={{ width: "100%" }}></iframe>
           </div>
         </div>
         <div style={{ flex: "0 0 50%" }}>
@@ -135,7 +134,6 @@ const Live = () => {
             >
               <label htmlFor="camera">Today's Detection</label>
               <br></br>
-
               <select
                 name="camera"
                 id="camera"
@@ -143,13 +141,12 @@ const Live = () => {
                   width: "300px",
                   padding: "10px",
                   background: "#DBE4F4",
-
                   borderRadius: "4px",
                   border: "0",
                   marginTop: "10px",
                 }}
               >
-                <option value="volvo">Volvo</option>
+                <option value="criminal">Criminal</option>
                 <option value="saab">Saab</option>
                 <option value="mercedes">Mercedes</option>
                 <option value="audi">Audi</option>

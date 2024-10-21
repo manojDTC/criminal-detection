@@ -1,4 +1,3 @@
-import React from "react";
 import image from "../assets/image 19.png";
 import star from "../assets/start.png";
 import tick from "../assets/tick.png";
@@ -220,7 +219,7 @@ const TimeLine = () => {
               <br></br>
               <span style={{ fontSize: "10px" }}>Entrance</span>
             </div>
-          </div>{" "}
+          </div>
           <div>
             <img
               src={image}
@@ -247,7 +246,7 @@ const TimeLine = () => {
               <br></br>
               <span style={{ fontSize: "10px" }}>Entrance</span>
             </div>
-          </div>{" "}
+          </div>
           <div>
             <img
               src={image}
@@ -274,7 +273,7 @@ const TimeLine = () => {
               <br></br>
               <span style={{ fontSize: "10px" }}>Entrance</span>
             </div>
-          </div>{" "}
+          </div>
           <div>
             <img
               src={image}
@@ -301,7 +300,7 @@ const TimeLine = () => {
               <br></br>
               <span style={{ fontSize: "10px" }}>Entrance</span>
             </div>
-          </div>{" "}
+          </div>
           <div>
             <img
               src={image}
@@ -328,7 +327,7 @@ const TimeLine = () => {
               <br></br>
               <span style={{ fontSize: "10px" }}>Entrance</span>
             </div>
-          </div>{" "}
+          </div>
           <div>
             <img
               src={image}
@@ -355,7 +354,7 @@ const TimeLine = () => {
               <br></br>
               <span style={{ fontSize: "10px" }}>Entrance</span>
             </div>
-          </div>{" "}
+          </div>
           <div>
             <img
               src={image}
@@ -382,7 +381,7 @@ const TimeLine = () => {
               <br></br>
               <span style={{ fontSize: "10px" }}>Entrance</span>
             </div>
-          </div>{" "}
+          </div>
           <div>
             <img
               src={image}

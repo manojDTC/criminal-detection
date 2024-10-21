@@ -1,4 +1,3 @@
-import React from "react";
 import {
   BrowserRouter as Router,
   Routes,
@@ -36,18 +35,18 @@ const AppRoutes = () => {
             }
           />
           <Route
-            path="/timeline"
-            element={
-              <Layout>
-                <TimeLine />
-              </Layout>
-            }
-          />
-          <Route
             path="/history"
             element={
               <Layout>
                 <History />
+              </Layout>
+            }
+          />
+          <Route
+            path="/timeline"
+            element={
+              <Layout>
+                <TimeLine />
               </Layout>
             }
           />

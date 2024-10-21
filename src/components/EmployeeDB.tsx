@@ -1,8 +1,27 @@
-import React from "react";
 import Tabs from "rc-tabs";
 import "rc-tabs/assets/index.css";
 
 const EmployeeDB = () => {
+  const employeeList = [
+    {
+      employeeName: "Sukanya Devi",
+      Gender: "she tells female",
+      EmployeeId: 444,
+      Role: "Dabba Fellow",
+      CameraName: "test1",
+      TotalImages: 840,
+      imageUrl: "",
+    },
+    {
+      employeeName: "Sukanya Devi",
+      Gender: "she tells female",
+      EmployeeId: 444,
+      Role: "Dabba Fellow",
+      CameraName: "test1",
+      TotalImages: 840,
+      imageUrl: "",
+    },
+  ];
   const callback = (key: number) => {
     console.log(key);
   };
@@ -87,7 +106,6 @@ const EmployeeDB = () => {
       ),
       children: (
         <div>
-          {" "}
           <table className="dbtable">
             <tbody>
               <tr>
