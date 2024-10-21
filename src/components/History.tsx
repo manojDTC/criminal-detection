@@ -114,7 +114,7 @@ const History = () => {
             </select>
           </div>
         </div>
-        <div style={{ height: "calc(100vh - 230px)", overflow: "scroll" }}>
+        <div style={{ height: "calc(100vh - 200px)", overflow: "scroll" }}>
           <table className="dbtable criminaltable">
             <tbody>
               <tr>
@@ -161,24 +161,29 @@ const History = () => {
                 </td>
               </tr>
               <tr>
+                <td>1</td>
                 <td>
                   <img
-                    src={image1}
+                    src={image}
                     alt=""
                     style={{
-                      height: "66px",
-                      width: "66px",
+                      height: "46px",
+                      width: "46px",
                       objectFit: "contain",
+                      borderRadius: "50%",
+                      margin: "5px",
                     }}
                   ></img>
                 </td>
+                <td>Roy Thomas</td>
                 <td>M</td>
-                <td>E-101</td>
+                <td>2024-10-16 14:40:44</td>
+                <td>CP Mumbai</td>
                 <td>
                   <span style={{ verticalAlign: "middle" }}>
                     <img
-                      src={cap}
-                      alt="cap"
+                      src={null1}
+                      alt="null"
                       style={{
                         marginRight: "5px",
                         height: "15px",
@@ -190,24 +195,29 @@ const History = () => {
                 </td>
               </tr>
               <tr>
+                <td>1</td>
                 <td>
                   <img
                     src={image}
                     alt=""
                     style={{
-                      height: "66px",
-                      width: "66px",
+                      height: "46px",
+                      width: "46px",
                       objectFit: "contain",
+                      borderRadius: "50%",
+                      margin: "5px",
                     }}
                   ></img>
                 </td>
+                <td>Roy Thomas</td>
                 <td>M</td>
-                <td>E-101</td>
+                <td>2024-10-16 14:40:44</td>
+                <td>CP Mumbai</td>
                 <td>
                   <span style={{ verticalAlign: "middle" }}>
                     <img
-                      src={mask}
-                      alt="mask"
+                      src={null1}
+                      alt="null"
                       style={{
                         marginRight: "5px",
                         height: "15px",
@@ -219,43 +229,171 @@ const History = () => {
                 </td>
               </tr>
               <tr>
+                <td>1</td>
                 <td>
                   <img
                     src={image}
                     alt=""
                     style={{
-                      height: "66px",
-                      width: "66px",
+                      height: "46px",
+                      width: "46px",
                       objectFit: "contain",
+                      borderRadius: "50%",
+                      margin: "5px",
                     }}
                   ></img>
                 </td>
+                <td>Roy Thomas</td>
                 <td>M</td>
-                <td>E-101</td>
+                <td>2024-10-16 14:40:44</td>
+                <td>CP Mumbai</td>
                 <td>
-                  <span>
-                    <img src={null1} alt="null"></img>
+                  <span style={{ verticalAlign: "middle" }}>
+                    <img
+                      src={null1}
+                      alt="null"
+                      style={{
+                        marginRight: "5px",
+                        height: "15px",
+                        width: "15pxs",
+                      }}
+                    ></img>
                   </span>
                   null
                 </td>
               </tr>
               <tr>
+                <td>1</td>
                 <td>
                   <img
                     src={image}
                     alt=""
                     style={{
-                      height: "66px",
-                      width: "66px",
+                      height: "46px",
+                      width: "46px",
                       objectFit: "contain",
+                      borderRadius: "50%",
+                      margin: "5px",
                     }}
                   ></img>
                 </td>
+                <td>Roy Thomas</td>
                 <td>M</td>
-                <td>E-101</td>
+                <td>2024-10-16 14:40:44</td>
+                <td>CP Mumbai</td>
                 <td>
-                  <span>
-                    <img src={null1} alt="null"></img>
+                  <span style={{ verticalAlign: "middle" }}>
+                    <img
+                      src={null1}
+                      alt="null"
+                      style={{
+                        marginRight: "5px",
+                        height: "15px",
+                        width: "15pxs",
+                      }}
+                    ></img>
+                  </span>
+                  null
+                </td>
+              </tr>
+              <tr>
+                <td>1</td>
+                <td>
+                  <img
+                    src={image}
+                    alt=""
+                    style={{
+                      height: "46px",
+                      width: "46px",
+                      objectFit: "contain",
+                      borderRadius: "50%",
+                      margin: "5px",
+                    }}
+                  ></img>
+                </td>
+                <td>Roy Thomas</td>
+                <td>M</td>
+                <td>2024-10-16 14:40:44</td>
+                <td>CP Mumbai</td>
+                <td>
+                  <span style={{ verticalAlign: "middle" }}>
+                    <img
+                      src={null1}
+                      alt="null"
+                      style={{
+                        marginRight: "5px",
+                        height: "15px",
+                        width: "15pxs",
+                      }}
+                    ></img>
+                  </span>
+                  null
+                </td>
+              </tr>
+              <tr>
+                <td>1</td>
+                <td>
+                  <img
+                    src={image}
+                    alt=""
+                    style={{
+                      height: "46px",
+                      width: "46px",
+                      objectFit: "contain",
+                      borderRadius: "50%",
+                      margin: "5px",
+                    }}
+                  ></img>
+                </td>
+                <td>Roy Thomas</td>
+                <td>M</td>
+                <td>2024-10-16 14:40:44</td>
+                <td>CP Mumbai</td>
+                <td>
+                  <span style={{ verticalAlign: "middle" }}>
+                    <img
+                      src={null1}
+                      alt="null"
+                      style={{
+                        marginRight: "5px",
+                        height: "15px",
+                        width: "15pxs",
+                      }}
+                    ></img>
+                  </span>
+                  null
+                </td>
+              </tr>
+              <tr>
+                <td>1</td>
+                <td>
+                  <img
+                    src={image}
+                    alt=""
+                    style={{
+                      height: "46px",
+                      width: "46px",
+                      objectFit: "contain",
+                      borderRadius: "50%",
+                      margin: "5px",
+                    }}
+                  ></img>
+                </td>
+                <td>Roy Thomas</td>
+                <td>M</td>
+                <td>2024-10-16 14:40:44</td>
+                <td>CP Mumbai</td>
+                <td>
+                  <span style={{ verticalAlign: "middle" }}>
+                    <img
+                      src={null1}
+                      alt="null"
+                      style={{
+                        marginRight: "5px",
+                        height: "15px",
+                        width: "15pxs",
+                      }}
+                    ></img>
                   </span>
                   null
                 </td>
