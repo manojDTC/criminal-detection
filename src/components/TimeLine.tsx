@@ -73,6 +73,7 @@ const TimeLine = () => {
             gap: "20px",
             alignItems: "center",
             width: "100%",
+            margin: "10px 0",
           }}
         >
           <div style={{ display: "flex", alignItems: "center", gap: "5px" }}>
@@ -154,7 +155,7 @@ const TimeLine = () => {
           padding: "20px 15px ",
           borderRadius: "6px",
           marginBottom: "15px",
-          height: "calc(100vh - 335px)",
+          height: "calc(100vh - 330px)",
           overflow: "scroll",
         }}
       >
