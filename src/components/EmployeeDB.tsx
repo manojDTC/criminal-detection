@@ -1,27 +1,71 @@
+import React, { useEffect, useState } from "react";
 import Tabs from "rc-tabs";
 import "rc-tabs/assets/index.css";
+import axios from "axios";
+
+interface Employee {
+  employeeId: number;
+  employeeName: string;
+  gender: string;
+  role: string;
+  cameraName: string;
+  totalImages: number;
+  imageUrl: string;
+}
 
 const EmployeeDB = () => {
-  const employeeList = [
+  const [employees, setEmployees] = useState<Employee[]>([]);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [error, setError] = useState<string | null>(null);
+  const employeeList: Employee[] = [
     {
       employeeName: "Sukanya Devi",
-      Gender: "she tells female",
-      EmployeeId: 444,
-      Role: "Dabba Fellow",
-      CameraName: "test1",
-      TotalImages: 840,
+      gender: "she tells female",
+      employeeId: 444,
+      role: "Dabba Fellow",
+      cameraName: "test1",
+      totalImages: 840,
       imageUrl: "",
     },
     {
       employeeName: "Sukanya Devi",
-      Gender: "she tells female",
-      EmployeeId: 444,
-      Role: "Dabba Fellow",
-      CameraName: "test1",
-      TotalImages: 840,
+      gender: "she tells female",
+      employeeId: 444,
+      role: "Dabba Fellow",
+      cameraName: "test1",
+      totalImages: 840,
       imageUrl: "",
     },
   ];
+
+  useEffect(() => {
+    // Fetch employee list on component mount
+    const fetchEmployees = async () => {
+      try {
+        // const response = await axios.get<Employee[]>(
+        //   "https://api.example.com/employees"
+        // );
+        const response = employeeList;
+        //setEmployees(response.data);
+        setEmployees(response);
+      } catch (error) {
+        setError("Failed to load employees");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchEmployees();
+  }, []);
+
+  if (loading) {
+    return <div>Loading...</div>;
+  }
+
+  if (error) {
+    return <div>{error}</div>;
+  }
+
   const callback = (key: number) => {
     console.log(key);
   };
@@ -42,58 +86,21 @@ const EmployeeDB = () => {
                 <th>Camera Name</th>
                 <th>Total Images</th>
               </tr>
-              <tr>
-                <td>
-                  <span>
-                    <img src="" alt=""></img>
-                  </span>
-                  Name
-                </td>
-                <td>M</td>
-                <td>E-101</td>
-                <td>Manager</td>
-                <td>Camera1</td>
-                <td>20</td>
-              </tr>
-              <tr>
-                <td>
-                  <span>
-                    <img src="" alt=""></img>
-                  </span>
-                  Name
-                </td>
-                <td>M</td>
-                <td>E-101</td>
-                <td>Manager</td>
-                <td>Camera1</td>
-                <td>20</td>
-              </tr>{" "}
-              <tr>
-                <td>
-                  <span>
-                    <img src="" alt=""></img>
-                  </span>
-                  Name
-                </td>
-                <td>M</td>
-                <td>E-101</td>
-                <td>Manager</td>
-                <td>Camera1</td>
-                <td>20</td>
-              </tr>{" "}
-              <tr>
-                <td>
-                  <span>
-                    <img src="" alt=""></img>
-                  </span>
-                  Name
-                </td>
-                <td>M</td>
-                <td>E-101</td>
-                <td>Manager</td>
-                <td>Camera1</td>
-                <td>20</td>
-              </tr>
+              {employees.map((employee) => (
+                <tr key={employee.employeeId}>
+                  <td>
+                    <span>
+                      <img src={employee.imageUrl} alt=""></img>
+                    </span>
+                    {employee.employeeName}
+                  </td>
+                  <td>{employee.gender}</td>
+                  <td>{employee.employeeId}</td>
+                  <td>{employee.role}</td>
+                  <td>{employee.cameraName}</td>
+                  <td>{employee.totalImages}</td>
+                </tr>
+              ))}
             </tbody>
           </table>
         </div>
@@ -141,7 +148,7 @@ const EmployeeDB = () => {
                 <td>Manager</td>
                 <td>Camera1</td>
                 <td>20</td>
-              </tr>{" "}
+              </tr>
               <tr>
                 <td>
                   <span>
@@ -154,7 +161,7 @@ const EmployeeDB = () => {
                 <td>Manager</td>
                 <td>Camera1</td>
                 <td>20</td>
-              </tr>{" "}
+              </tr>
               <tr>
                 <td>
                   <span>
