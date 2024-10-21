@@ -12,9 +12,18 @@ interface Employee {
   totalImages: number;
   imageUrl: string;
 }
-
+interface Criminal {
+  suspectedId: number;
+  criminalName: string;
+  gender: string;
+  issuedBy: string;
+  poc: string;
+  totalImages: number;
+  imageUrl: string;
+}
 const EmployeeDB = () => {
   const [employees, setEmployees] = useState<Employee[]>([]);
+  const [criminals, setCriminal] = useState<Criminal[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   const employeeList: Employee[] = [
@@ -37,7 +46,26 @@ const EmployeeDB = () => {
       imageUrl: "",
     },
   ];
-
+  const criminalList: Criminal[] = [
+    {
+      suspectedId: 420,
+      criminalName: "Manoj DS",
+      gender: "Male",
+      issuedBy: "CP Bangalore",
+      poc: "Camera1",
+      totalImages: 100,
+      imageUrl: "",
+    },
+    {
+      suspectedId: 420,
+      criminalName: "Manoj DS",
+      gender: "Male",
+      issuedBy: "CP Bangalore",
+      poc: "Camera1",
+      totalImages: 100,
+      imageUrl: "",
+    },
+  ];
   useEffect(() => {
     // Fetch employee list on component mount
     const fetchEmployees = async () => {
@@ -56,6 +84,22 @@ const EmployeeDB = () => {
     };
 
     fetchEmployees();
+    const fetchCriminals = async () => {
+      try {
+        // const response = await axios.get<Criminal[]>(
+        //   "https://api.example.com/criminals"
+        // );
+        const response = criminalList;
+        //setEmployees(response.data);
+        setCriminal(response);
+      } catch (error) {
+        setError("Failed to load criminals");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchCriminals();
   }, []);
 
   if (loading) {
@@ -123,58 +167,21 @@ const EmployeeDB = () => {
                 <th>POC</th>
                 <th>Total Images</th>
               </tr>
-              <tr>
-                <td>
-                  <span>
-                    <img src="" alt=""></img>
-                  </span>
-                  Name
-                </td>
-                <td>M</td>
-                <td>E-101</td>
-                <td>Manager</td>
-                <td>Camera1</td>
-                <td>20</td>
-              </tr>
-              <tr>
-                <td>
-                  <span>
-                    <img src="" alt=""></img>
-                  </span>
-                  Name
-                </td>
-                <td>M</td>
-                <td>E-101</td>
-                <td>Manager</td>
-                <td>Camera1</td>
-                <td>20</td>
-              </tr>
-              <tr>
-                <td>
-                  <span>
-                    <img src="" alt=""></img>
-                  </span>
-                  Name
-                </td>
-                <td>M</td>
-                <td>E-101</td>
-                <td>Manager</td>
-                <td>Camera1</td>
-                <td>20</td>
-              </tr>
-              <tr>
-                <td>
-                  <span>
-                    <img src="" alt=""></img>
-                  </span>
-                  Name
-                </td>
-                <td>M</td>
-                <td>E-101</td>
-                <td>Manager</td>
-                <td>Camera1</td>
-                <td>20</td>
-              </tr>
+              {criminals.map((criminal) => (
+                <tr key={criminal.suspectedId}>
+                  <td>
+                    <span>
+                      <img src={criminal.imageUrl} alt=""></img>
+                    </span>
+                    {criminal.criminalName}
+                  </td>
+                  <td>{criminal.gender}</td>
+                  <td>{criminal.suspectedId}</td>
+                  <td>{criminal.issuedBy}</td>
+                  <td>{criminal.poc}</td>
+                  <td>{criminal.totalImages}</td>
+                </tr>
+              ))}
             </tbody>
           </table>
         </div>
