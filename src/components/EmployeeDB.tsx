@@ -26,13 +26,20 @@ interface Employee {
 }
 
 interface Criminal {
-  suspectedId: number;
-  criminalName: string;
+  id: string;
+  name: string;
   gender: string;
+  personType: string;
+  code: string;
+  email: string;
+  contactNo: string;
+  language: string;
+  country: string;
   issuedBy: string;
   poc: string;
-  totalImages: number;
-  imageUrl: string;
+  originCity: string;
+  crime: string;
+  images: ImageDetails[];
 }
 
 const EmployeeDB = () => {
@@ -43,26 +50,7 @@ const EmployeeDB = () => {
   const [key, setKey] = useState<string | null>("1");
   const employeeList: Employee[] = [];
 
-  const criminalList: Criminal[] = [
-    {
-      suspectedId: 423,
-      criminalName: "Manoj DS",
-      gender: "Male",
-      issuedBy: "CP Bangalore",
-      poc: "Camera1",
-      totalImages: 100,
-      imageUrl: "",
-    },
-    {
-      suspectedId: 488,
-      criminalName: "Manoj DS",
-      gender: "Male",
-      issuedBy: "CP Bangalore",
-      poc: "Camera1",
-      totalImages: 100,
-      imageUrl: "",
-    },
-  ];
+  const criminalList: Criminal[] = [];
 
   useEffect(() => {
     const fetchEmployees = async () => {
@@ -82,12 +70,10 @@ const EmployeeDB = () => {
 
     const fetchCriminals = async () => {
       try {
-        // const response = await axios.get<Criminal[]>(
-        //   "https://api.example.com/criminals"
-        // );
-        const response = criminalList;
-        //setEmployees(response.data);
-        setCriminal(response);
+        const response = await axios.get<Criminal[]>(
+          `${process.env.REACT_APP_BASE_URL}/api/Person/GetCriminalsImagesAsync`
+        );
+        setCriminal(response.data);
       } catch (error) {
         toast.error("Failed to load criminals");
         setError("Failed to load criminals");
@@ -120,43 +106,45 @@ const EmployeeDB = () => {
               Loading...
             </p>
           ) : (
-            <table className="dbtable">
-              <tbody>
-                <tr>
-                  <th>Name</th>
-                  <th>Gender</th>
-                  <th>Employee Id</th>
-                  <th>Role</th>
-                  <th>Camera Name</th>
-                  <th>Total Images</th>
-                </tr>
-                {employees.map((employee) => {
-                  const totalImages = employee.images.length;
-                  const firstImageUrl =
-                    employee.images.length > 0
-                      ? employee.images[0].imageUrl
-                      : "No Image";
-                  return (
-                    <tr key={employee.id}>
-                      <td>
-                        <span>
-                          <img
-                            src={`${process.env.REACT_APP_BASE_URL}${firstImageUrl}`}
-                            alt=""
-                          ></img>
-                        </span>
-                        {employee.name}
-                      </td>
-                      <td>{employee.gender}</td>
-                      <td>{employee.code}</td>
-                      <td>{employee.role}</td>
-                      <td>{employee.cameraName}</td>
-                      <td>{totalImages}</td>
-                    </tr>
-                  );
-                })}
-              </tbody>
-            </table>
+            <div style={{ overflow: "auto", maxHeight: "calc(100vh - 220px)" }}>
+              <table className="dbtable">
+                <tbody>
+                  <tr>
+                    <th>Name</th>
+                    <th>Gender</th>
+                    <th>Employee Id</th>
+                    <th>Role</th>
+                    <th>Camera Name</th>
+                    <th>Total Images</th>
+                  </tr>
+                  {employees.map((employee) => {
+                    const totalImages = employee.images.length;
+                    const firstImageUrl =
+                      employee.images.length > 0
+                        ? employee.images[0].imageUrl
+                        : "No Image";
+                    return (
+                      <tr key={employee.id}>
+                        <td>
+                          <span>
+                            <img
+                              src={`${process.env.REACT_APP_BASE_URL}${firstImageUrl}`}
+                              alt=""
+                            ></img>
+                          </span>
+                          {employee.name}
+                        </td>
+                        <td>{employee.gender}</td>
+                        <td>{employee.code}</td>
+                        <td>{employee.role}</td>
+                        <td>{employee.cameraName}</td>
+                        <td>{totalImages}</td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
           )}
         </div>
       ),
@@ -173,33 +161,45 @@ const EmployeeDB = () => {
               Loading...
             </p>
           ) : (
-            <table className="dbtable">
-              <tbody>
-                <tr>
-                  <th>Name</th>
-                  <th>Gender</th>
-                  <th>Suspected Id</th>
-                  <th>Issued By</th>
-                  <th>POC</th>
-                  <th>Total Images</th>
-                </tr>
-                {criminals.map((criminal) => (
-                  <tr key={criminal.suspectedId}>
-                    <td>
-                      <span>
-                        <img src={criminal.imageUrl} alt=""></img>
-                      </span>
-                      {criminal.criminalName}
-                    </td>
-                    <td>{criminal.gender}</td>
-                    <td>{criminal.suspectedId}</td>
-                    <td>{criminal.issuedBy}</td>
-                    <td>{criminal.poc}</td>
-                    <td>{criminal.totalImages}</td>
+            <div style={{ overflow: "auto", maxHeight: "calc(100vh - 220px)" }}>
+              <table className="dbtable">
+                <tbody>
+                  <tr>
+                    <th>Name</th>
+                    <th>Gender</th>
+                    <th>Suspected Id</th>
+                    <th>Issued By</th>
+                    <th>POC</th>
+                    <th>Total Images</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
+                  {criminals.map((criminal) => {
+                    const totalImages = criminal.images.length;
+                    const firstImageUrl =
+                      criminal.images.length > 0
+                        ? criminal.images[0].imageUrl
+                        : "No Image";
+                    return (
+                      <tr key={criminal.id}>
+                        <td>
+                          <span>
+                            <img
+                              src={`${process.env.REACT_APP_BASE_URL}${firstImageUrl}`}
+                              alt=""
+                            ></img>
+                          </span>
+                          {criminal.name}
+                        </td>
+                        <td>{criminal.gender}</td>
+                        <td>{criminal.code}</td>
+                        <td>{criminal.issuedBy}</td>
+                        <td>{criminal.poc}</td>
+                        <td>{totalImages}</td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
           )}
         </div>
       ),
