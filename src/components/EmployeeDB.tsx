@@ -27,6 +27,7 @@ const EmployeeDB = () => {
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   const [key, setKey] = useState<string | null>("1");
+  const [isOpen, setIsOpen] = useState<boolean>(false);
   const employeeList: Employee[] = [
     {
       employeeName: "Sukanya Devi",
@@ -67,6 +68,17 @@ const EmployeeDB = () => {
       imageUrl: "",
     },
   ];
+
+  // Open modal
+  const openModal = () => {
+    setIsOpen(true);
+  };
+
+  // Close modal
+  const closeModal = () => {
+    setIsOpen(false);
+  };
+
   useEffect(() => {
     const fetchEmployees = async () => {
       try {
@@ -83,7 +95,7 @@ const EmployeeDB = () => {
       }
     };
     fetchEmployees();
-        
+
     const fetchCriminals = async () => {
       try {
         // const response = await axios.get<Criminal[]>(
@@ -98,13 +110,13 @@ const EmployeeDB = () => {
         setLoading(false);
       }
     };
-    
+
     if (key === "1") {
       fetchEmployees();
     }
-    
-    if(key==="2"){
-          fetchCriminals();
+
+    if (key === "2") {
+      fetchCriminals();
     }
   }, [key]);
 
@@ -225,6 +237,7 @@ const EmployeeDB = () => {
             padding: "10px",
             cursor: "pointer",
           }}
+          onClick={openModal}
         >
           Add Employee
         </button>
@@ -237,6 +250,48 @@ const EmployeeDB = () => {
         onChange={callback}
         style={{ color: "black" }}
       />
+      {isOpen && (
+        <div className="modal">
+          <div className="modal-content">
+            <span className="close" onClick={closeModal}>
+              &times;
+            </span>
+            <h2>Add Employee</h2>
+            <form>
+              <div>
+                <label htmlFor="name">UserName</label>
+                <input type="text" id="name" name="name" required />
+              </div>
+              <div>
+                <label htmlFor="email">Email:</label>
+                <input type="email" id="email" name="email" required />
+              </div>
+              <div>
+                <label htmlFor="email">Role:</label>
+                <input type="email" id="email" name="email" required />
+              </div>
+              <div>
+                <label htmlFor="email">Employee ID:</label>
+                <input type="email" id="email" name="email" required />
+              </div>
+              <div>
+                <label htmlFor="email">Contact:</label>
+                <input type="email" id="email" name="email" required />
+              </div>
+              <div>
+                <label htmlFor="email">Language:</label>
+                <input type="email" id="email" name="email" required />
+              </div>
+              <div>
+                <label htmlFor="email">Country:</label>
+                <input type="email" id="email" name="email" required />
+              </div>
+
+              <button type="submit">Add</button>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
