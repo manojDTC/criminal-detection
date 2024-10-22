@@ -10,6 +10,7 @@ import Layout from "./layout/Layout";
 import Live from "./components/Live";
 import TimeLine from "./components/TimeLine";
 import History from "./components/History";
+import Alert from "./components/Alert";
 
 const AppRoutes = () => {
   return (
@@ -47,6 +48,15 @@ const AppRoutes = () => {
             element={
               <Layout>
                 <TimeLine />
+              </Layout>
+            }
+          />
+
+          <Route
+            path="/Alert"
+            element={
+              <Layout>
+                <Alert />
               </Layout>
             }
           />
