@@ -2,16 +2,29 @@ import React, { useEffect, useState } from "react";
 import Tabs from "rc-tabs";
 import "rc-tabs/assets/index.css";
 import axios from "axios";
+import { toast } from "react-toastify";
+
+interface ImageDetails {
+  id: string;
+  imageUrl: string;
+  personId: string;
+}
 
 interface Employee {
-  employeeId: number;
-  employeeName: string;
+  id: number;
+  name: string;
   gender: string;
+  personType: string;
   role: string;
+  code: string;
+  email: string;
+  contactNo: string;
+  language: string;
+  country: string;
   cameraName: string;
-  totalImages: number;
-  imageUrl: string;
+  images: ImageDetails[];
 }
+
 interface Criminal {
   suspectedId: number;
   criminalName: string;
@@ -21,35 +34,18 @@ interface Criminal {
   totalImages: number;
   imageUrl: string;
 }
+
 const EmployeeDB = () => {
   const [employees, setEmployees] = useState<Employee[]>([]);
   const [criminals, setCriminal] = useState<Criminal[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   const [key, setKey] = useState<string | null>("1");
-  const employeeList: Employee[] = [
-    {
-      employeeName: "Sukanya Devi",
-      gender: "Female",
-      employeeId: 4434,
-      role: "Employee",
-      cameraName: "test1",
-      totalImages: 840,
-      imageUrl: "",
-    },
-    {
-      employeeName: "Sukanya Devi",
-      gender: "Female",
-      employeeId: 444,
-      role: "Employee",
-      cameraName: "test1",
-      totalImages: 840,
-      imageUrl: "",
-    },
-  ];
+  const employeeList: Employee[] = [];
+
   const criminalList: Criminal[] = [
     {
-      suspectedId: 420,
+      suspectedId: 423,
       criminalName: "Manoj DS",
       gender: "Male",
       issuedBy: "CP Bangalore",
@@ -58,7 +54,7 @@ const EmployeeDB = () => {
       imageUrl: "",
     },
     {
-      suspectedId: 420,
+      suspectedId: 488,
       criminalName: "Manoj DS",
       gender: "Male",
       issuedBy: "CP Bangalore",
@@ -67,23 +63,23 @@ const EmployeeDB = () => {
       imageUrl: "",
     },
   ];
+
   useEffect(() => {
     const fetchEmployees = async () => {
       try {
-        // const response = await axios.get<Employee[]>(
-        //   "https://api.example.com/employees"
-        // );
-        const response = employeeList;
-        //setEmployees(response.data);
-        setEmployees(response);
+        const response = await axios.get<Employee[]>(
+          `${process.env.REACT_APP_BASE_URL}/api/Person/GetEmployeesImages`
+        );
+        setEmployees(response.data);
       } catch (error) {
+        toast.error("Failed to load employees");
         setError("Failed to load employees");
       } finally {
         setLoading(false);
       }
     };
     fetchEmployees();
-        
+
     const fetchCriminals = async () => {
       try {
         // const response = await axios.get<Criminal[]>(
@@ -93,28 +89,21 @@ const EmployeeDB = () => {
         //setEmployees(response.data);
         setCriminal(response);
       } catch (error) {
+        toast.error("Failed to load criminals");
         setError("Failed to load criminals");
       } finally {
         setLoading(false);
       }
     };
-    
+
     if (key === "1") {
       fetchEmployees();
     }
-    
-    if(key==="2"){
-          fetchCriminals();
+
+    if (key === "2") {
+      fetchCriminals();
     }
   }, [key]);
-
-  if (loading) {
-    return <div>Loading...</div>;
-  }
-
-  if (error) {
-    return <div>{error}</div>;
-  }
 
   const callback = (key: string) => {
     setKey(key);
@@ -126,33 +115,49 @@ const EmployeeDB = () => {
       label: <p style={{ fontSize: "16px" }}>Employee List</p>,
       children: (
         <div className="text-xl">
-          <table className="dbtable">
-            <tbody>
-              <tr>
-                <th>Name</th>
-                <th>Gender</th>
-                <th>Employee Id</th>
-                <th>Role</th>
-                <th>Camera Name</th>
-                <th>Total Images</th>
-              </tr>
-              {employees.map((employee) => (
-                <tr key={employee.employeeId}>
-                  <td>
-                    <span>
-                      <img src={employee.imageUrl} alt=""></img>
-                    </span>
-                    {employee.employeeName}
-                  </td>
-                  <td>{employee.gender}</td>
-                  <td>{employee.employeeId}</td>
-                  <td>{employee.role}</td>
-                  <td>{employee.cameraName}</td>
-                  <td>{employee.totalImages}</td>
+          {loading ? (
+            <p style={{ textAlign: "center", alignContent: "center" }}>
+              Loading...
+            </p>
+          ) : (
+            <table className="dbtable">
+              <tbody>
+                <tr>
+                  <th>Name</th>
+                  <th>Gender</th>
+                  <th>Employee Id</th>
+                  <th>Role</th>
+                  <th>Camera Name</th>
+                  <th>Total Images</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
+                {employees.map((employee) => {
+                  const totalImages = employee.images.length;
+                  const firstImageUrl =
+                    employee.images.length > 0
+                      ? employee.images[0].imageUrl
+                      : "No Image";
+                  return (
+                    <tr key={employee.id}>
+                      <td>
+                        <span>
+                          <img
+                            src={`${process.env.REACT_APP_BASE_URL}${firstImageUrl}`}
+                            alt=""
+                          ></img>
+                        </span>
+                        {employee.name}
+                      </td>
+                      <td>{employee.gender}</td>
+                      <td>{employee.code}</td>
+                      <td>{employee.role}</td>
+                      <td>{employee.cameraName}</td>
+                      <td>{totalImages}</td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          )}
         </div>
       ),
     },
@@ -163,33 +168,39 @@ const EmployeeDB = () => {
       ),
       children: (
         <div>
-          <table className="dbtable">
-            <tbody>
-              <tr>
-                <th>Name</th>
-                <th>Gender</th>
-                <th>Suspected Id</th>
-                <th>Issued By</th>
-                <th>POC</th>
-                <th>Total Images</th>
-              </tr>
-              {criminals.map((criminal) => (
-                <tr key={criminal.suspectedId}>
-                  <td>
-                    <span>
-                      <img src={criminal.imageUrl} alt=""></img>
-                    </span>
-                    {criminal.criminalName}
-                  </td>
-                  <td>{criminal.gender}</td>
-                  <td>{criminal.suspectedId}</td>
-                  <td>{criminal.issuedBy}</td>
-                  <td>{criminal.poc}</td>
-                  <td>{criminal.totalImages}</td>
+          {loading ? (
+            <p style={{ textAlign: "center", alignContent: "center" }}>
+              Loading...
+            </p>
+          ) : (
+            <table className="dbtable">
+              <tbody>
+                <tr>
+                  <th>Name</th>
+                  <th>Gender</th>
+                  <th>Suspected Id</th>
+                  <th>Issued By</th>
+                  <th>POC</th>
+                  <th>Total Images</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
+                {criminals.map((criminal) => (
+                  <tr key={criminal.suspectedId}>
+                    <td>
+                      <span>
+                        <img src={criminal.imageUrl} alt=""></img>
+                      </span>
+                      {criminal.criminalName}
+                    </td>
+                    <td>{criminal.gender}</td>
+                    <td>{criminal.suspectedId}</td>
+                    <td>{criminal.issuedBy}</td>
+                    <td>{criminal.poc}</td>
+                    <td>{criminal.totalImages}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          )}
         </div>
       ),
     },

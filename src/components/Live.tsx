@@ -1,10 +1,80 @@
+import React, { useEffect, useState } from "react";
 import image from "../assets/image 19.png";
 import image1 from "../assets/image 20.png";
 import cap from "../assets/cap.png";
 import mask from "../assets/mask.png";
 import null1 from "../assets/null.png";
+import axios from "axios";
+
+interface CameraList {
+  cameraId: number;
+  cameratype: string;
+  cameraLocation: string;
+  cameraStatus: string;
+}
 
 const Live = () => {
+  const [cameraLists, setCameraLists] = useState<CameraList[]>([]);
+  const [selectedCamera, setSelectedCamera] = useState<CameraList | null>(null);
+  const [error, setError] = useState<string | null>(null);
+  const [loading, setLoading] = useState<boolean>(true);
+  const cameraList: CameraList[] = [
+    {
+      cameraId: 1,
+      cameratype: "Camera1",
+      cameraLocation: "Entrance1",
+      cameraStatus: "active",
+    },
+    {
+      cameraId: 12,
+      cameratype: "Camera2",
+      cameraLocation: "Entrance2",
+      cameraStatus: "active",
+    },
+    {
+      cameraId: 3,
+      cameratype: "Camera3",
+      cameraLocation: "Exit",
+      cameraStatus: "inactive",
+    },
+  ];
+
+  useEffect(() => {
+    // Fetch employee list on component mount
+    const fetchCameraList = async () => {
+      try {
+        // const response = await axios.get<CameraList[]>(
+        //   "https://api.example.com/cameralists"
+        // );
+        const response = cameraList;
+        //setEmployees(response.data);
+        setCameraLists(response);
+      } catch (error) {
+        setError("Failed to load employees");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchCameraList();
+  }, []);
+
+  if (loading) {
+    return <div>Loading...</div>;
+  }
+
+  if (error) {
+    return <div>{error}</div>;
+  }
+
+  const test = (event: React.ChangeEvent<HTMLSelectElement>) => {
+    const selectedCameraType = event.target.value;
+    const camera = cameraLists.find(
+      (camera) => camera.cameratype === selectedCameraType
+    );
+    setSelectedCamera(camera || null);
+  };
+
   return (
     <div
       style={{
@@ -40,76 +110,81 @@ const Live = () => {
                 width: "100%",
                 padding: "10px",
                 background: "#EEF0F3",
-
                 borderRadius: "4px",
                 border: "0",
                 marginTop: "10px",
               }}
+              onChange={test}
             >
-              <option value="volvo">Volvo</option>
-              <option value="saab">Saab</option>
-              <option value="mercedes">Mercedes</option>
-              <option value="audi">Audi</option>
+              {cameraLists.map((camera) => (
+                <option key={camera.cameraId} value={camera.cameratype}>
+                  {camera.cameratype}
+                </option>
+              ))}
             </select>
           </div>
-          <div
-            style={{
-              display: "flex",
-              gap: "20px",
-              alignItems: "center",
-              width: "100%",
-            }}
-          >
+          {selectedCamera && (
             <div
               style={{
-                flex: "0  0 44%",
-                background: "white",
-                padding: "15px",
-                borderRadius: "6px",
+                display: "flex",
+                gap: "20px",
+                alignItems: "center",
+                width: "100%",
               }}
             >
-              <p style={{ marginTop: "0", fontSize: "14px" }}>
-                Camera Location
-              </p>
-              <p
+              <div
                 style={{
-                  padding: "10px",
-                  borderRadius: "4px",
-                  background: "#9333EA",
-                  fontSize: "14px",
-                  color: "white",
-                  fontWeight: "600",
-                  margin: "0",
+                  flex: "0  0 44%",
+                  background: "white",
+                  padding: "15px",
+                  borderRadius: "6px",
                 }}
               >
-                Entrance
-              </p>
-            </div>
-            <div
-              style={{
-                flex: "0  0 44%",
-                background: "white",
-                padding: "15px",
-                borderRadius: "6px",
-              }}
-            >
-              <p style={{ marginTop: "0", fontSize: "14px" }}>Status</p>
-              <p
-                style={{
-                  padding: "10px",
-                  borderRadius: "4px",
-                  background: "#8AC53E",
+                <p style={{ marginTop: "0", fontSize: "14px" }}>
+                  Camera Location
+                </p>
 
-                  fontSize: "14px",
-                  color: "white",
-                  fontWeight: "600",
-                  margin: "0",
+                <p
+                  style={{
+                    padding: "10px",
+                    borderRadius: "4px",
+                    background: "#9333EA",
+                    fontSize: "14px",
+                    color: "white",
+                    fontWeight: "600",
+                    margin: "0",
+                  }}
+                >
+                  {selectedCamera.cameraLocation}
+                </p>
+              </div>
+
+              <div
+                style={{
+                  flex: "0  0 44%",
+                  background: "white",
+                  padding: "15px",
+                  borderRadius: "6px",
                 }}
               >
-                Active
-              </p>
+                <p style={{ marginTop: "0", fontSize: "14px" }}>Status</p>
+                <p
+                  style={{
+                    padding: "10px",
+                    borderRadius: "4px",
+                    background: "#8AC53E",
+
+                    fontSize: "14px",
+                    color: "white",
+                    fontWeight: "600",
+                    margin: "0",
+                  }}
+                >
+                  {selectedCamera.cameraStatus}
+                </p>
+              </div>
             </div>
-          </div>
+          )}
           <div
             style={{
               background: "white",
