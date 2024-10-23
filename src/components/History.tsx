@@ -5,37 +5,134 @@ import cap from "../assets/cap.png";
 import mask from "../assets/mask.png";
 import null1 from "../assets/null.png";
 import { toast } from "react-toastify";
+import DatePicker from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
+import axios from "axios";
 
 interface History {
-  eventId: number;
   imageUrl: string;
   name: string;
   gender: string;
-  timeStamp: Date;
-  POC: string;
-  faceCoverage: string;
+  dateTime: Date;
+  poc: string;
+  faceCover: string;
+}
+
+interface Camera {
+  id: string;
+  name: string;
+  description: string;
+  customerId: string;
 }
 
 const History = () => {
-  const [history, setHistory] = useState<History[]>([]);
+  const [detectionList, setDetectionList] = useState<History[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
+  // const [fromDate, setFromDate] = useState<Date | null>(new Date());
+  // const [toDate, setToDate] = useState<Date | null>(new Date());
+  const [fromDate, setFromDate] = useState<Date | undefined>(undefined);
+  const [toDate, setToDate] = useState<Date | undefined>(undefined);
+  const [cameraList, setCameraList] = useState<Camera[]>([]);
+  const [selectedCamera, setSelectedCamera] = useState("");
+  const [personType, setPersonType] = useState<string[]>([]);
+  const [selectedPersonType, setSelectedPersonType] = useState<string>("");
+
+  // Handle start date selection
+  const handleFromDateChange = (date: Date | null) => {
+    if (toDate && date && date > toDate) {
+      toast.error("Start date cannot be later than the end date");
+      alert("Start date cannot be later than the end date");
+      return;
+    } else {
+      setFromDate(date || undefined);
+      fetchHistory();
+    }
+  };
+
+  // Handle to date selection
+  const handleToDateChange = (date: Date | null) => {
+    if (fromDate && date && date < fromDate) {
+      toast.error("End date cannot be earlier than the start date");
+      alert("End date cannot be earlier than the start date");
+    } else {
+      setToDate(date || undefined);
+      fetchHistory();
+    }
+  };
+
+  const fetchHistory = async () => {
+    try {
+      setLoading(true);
+      const data = {
+        cameraId: "3fa85f64-5717-4562-b3fc-2c963f66afa6",
+        fromDate: "2024-10-23T09:40:54.809Z",
+        todate: "2024-10-23T09:40:54.809Z",
+        type: "string",
+      };
+      const response = await axios.post<History[]>(
+        `${process.env.REACT_APP_BASE_URL}/api/Person/GetHistory`,
+        data
+      );
+      setDetectionList(response.data);
+    } catch (error) {
+      toast.error("Failed to load history");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
-    const fetchHistory = async () => {
+    fetchHistory();
+
+    const fetchCameraList = async () => {
+      setLoading(true);
       try {
-        // const response = await axios.get<History[]>(
-        //   `${process.env.REACT_APP_BASE_URL}/`
-        // );
-        //setHistory(response.data);
+        const response = await axios.get<Camera[]>(
+          `${process.env.REACT_APP_BASE_URL}/api/Person/GetAllCameras`
+        );
+        setCameraList(response.data);
+        setLoading(false);
       } catch (error) {
-        toast.error("Failed to load history");
+        toast.error("Failed to load Camera's");
       } finally {
         setLoading(false);
       }
     };
 
-    fetchHistory();
+    fetchCameraList();
+
+    const fetchPersonTypes = async () => {
+      setLoading(true);
+      try {
+        const response = await axios.get<string[]>(
+          `${process.env.REACT_APP_BASE_URL}/api/Person/GetPersonTypes`
+        );
+        setPersonType(response.data);
+        setLoading(false);
+      } catch (error) {
+        toast.error("Failed to load Persontype");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchPersonTypes();
   }, []);
+
+  const getSelectedCamera = async (
+    event: React.ChangeEvent<HTMLSelectElement>
+  ) => {
+    const cameraId = event.target.value;
+    setSelectedCamera(cameraId);
+    fetchHistory();
+  };
+
+  const getSelectedPersonType = (
+    event: React.ChangeEvent<HTMLSelectElement>
+  ) => {
+    setSelectedPersonType(event.target.value);
+    fetchHistory();
+  };
 
   return (
     <div
@@ -59,7 +156,6 @@ const History = () => {
           <div>
             <label htmlFor="camera">Select Camera</label>
             <br></br>
-
             <select
               name="camera"
               id="camera"
@@ -72,64 +168,69 @@ const History = () => {
                 border: "0",
                 marginTop: "10px",
               }}
+              onChange={getSelectedCamera}
+              value={selectedCamera}
             >
-              <option value="volvo">Volvo</option>
-              <option value="saab">Saab</option>
-              <option value="mercedes">Mercedes</option>
-              <option value="audi">Audi</option>
+              <option value="" disabled>
+                --Select Camera--
+              </option>
+              {cameraList.map((camera) => (
+                <option key={camera.id} value={camera.id}>
+                  {camera.name}
+                </option>
+              ))}
             </select>
           </div>
           <div>
             <label htmlFor="camera">Date From</label>
             <br></br>
-
-            <select
-              name="camera"
-              id="camera"
-              style={{
-                width: "300px",
-                padding: "10px",
-                background: "#EEF0F3",
-                borderRadius: "4px",
-                border: "0",
-                marginTop: "10px",
-              }}
-            >
-              <option value="volvo">Volvo</option>
-              <option value="saab">Saab</option>
-              <option value="mercedes">Mercedes</option>
-              <option value="audi">Audi</option>
-            </select>
+            <DatePicker
+              customInput={
+                <input
+                  style={{
+                    width: "300px",
+                    padding: "10px",
+                    background: "#EEF0F3",
+                    borderRadius: "4px",
+                    border: "0",
+                    marginTop: "10px",
+                  }}
+                />
+              }
+              selected={fromDate}
+              onChange={handleFromDateChange} // Use custom handler
+              maxDate={toDate} // Restrict future dates beyond the end date
+            />
           </div>
           <div>
             <label htmlFor="camera">Date To</label>
             <br></br>
 
-            <select
-              name="camera"
-              id="camera"
-              style={{
-                width: "300px",
-                padding: "10px",
-                background: "#EEF0F3",
-                borderRadius: "4px",
-                border: "0",
-                marginTop: "10px",
-              }}
-            >
-              <option value="volvo">Volvo</option>
-              <option value="saab">Saab</option>
-              <option value="mercedes">Mercedes</option>
-              <option value="audi">Audi</option>
-            </select>
+            <DatePicker
+              customInput={
+                <input
+                  style={{
+                    width: "300px",
+                    padding: "10px",
+                    background: "#EEF0F3",
+                    borderRadius: "4px",
+                    border: "0",
+                    marginTop: "10px",
+                  }}
+                />
+              }
+              selected={toDate}
+              onChange={handleToDateChange} // Use custom handler
+              minDate={fromDate} // Restrict dates before the start date
+            />
           </div>
           <div>
-            <label htmlFor="camera">Type</label>
+            <label htmlFor="Ptype">Type</label>
             <br></br>
 
             <select
-              name="camera"
-              id="camera"
+              name="Ptype"
+              id="Ptype"
               style={{
                 width: "300px",
                 padding: "10px",
@@ -138,11 +239,17 @@ const History = () => {
                 border: "0",
                 marginTop: "10px",
               }}
+              value={selectedPersonType}
+              onChange={getSelectedPersonType}
             >
-              <option value="volvo">Volvo</option>
-              <option value="saab">Saab</option>
-              <option value="mercedes">Mercedes</option>
-              <option value="audi">Audi</option>
+              <option value="" disabled selected>
+                --Select Type--
+              </option>
+              {personType.map((person, index) => (
+                <option key={index} value={person}>
+                  {person}
+                </option>
+              ))}
             </select>
           </div>
         </div>
@@ -158,278 +265,58 @@ const History = () => {
                 <th>POC</th>
                 <th>Face Coverage</th>
               </tr>
-              <tr>
-                <td>1</td>
-                <td>
-                  <img
-                    src={image}
-                    alt=""
-                    style={{
-                      height: "46px",
-                      width: "46px",
-                      objectFit: "contain",
-                      borderRadius: "50%",
-                      margin: "5px",
-                    }}
-                  ></img>
-                </td>
-                <td>Roy Thomas</td>
-                <td>M</td>
-                <td>2024-10-16 14:40:44</td>
-                <td>CP Mumbai</td>
-                <td>
-                  <span style={{ verticalAlign: "middle" }}>
-                    <img
-                      src={null1}
-                      alt="null"
-                      style={{
-                        marginRight: "5px",
-                        height: "15px",
-                        width: "15pxs",
-                      }}
-                    ></img>
-                  </span>
-                  null
-                </td>
-              </tr>
-              <tr>
-                <td>1</td>
-                <td>
-                  <img
-                    src={image}
-                    alt=""
-                    style={{
-                      height: "46px",
-                      width: "46px",
-                      objectFit: "contain",
-                      borderRadius: "50%",
-                      margin: "5px",
-                    }}
-                  ></img>
-                </td>
-                <td>Roy Thomas</td>
-                <td>M</td>
-                <td>2024-10-16 14:40:44</td>
-                <td>CP Mumbai</td>
-                <td>
-                  <span style={{ verticalAlign: "middle" }}>
-                    <img
-                      src={null1}
-                      alt="null"
-                      style={{
-                        marginRight: "5px",
-                        height: "15px",
-                        width: "15pxs",
-                      }}
-                    ></img>
-                  </span>
-                  null
-                </td>
-              </tr>
-              <tr>
-                <td>1</td>
-                <td>
-                  <img
-                    src={image}
-                    alt=""
-                    style={{
-                      height: "46px",
-                      width: "46px",
-                      objectFit: "contain",
-                      borderRadius: "50%",
-                      margin: "5px",
-                    }}
-                  ></img>
-                </td>
-                <td>Roy Thomas</td>
-                <td>M</td>
-                <td>2024-10-16 14:40:44</td>
-                <td>CP Mumbai</td>
-                <td>
-                  <span style={{ verticalAlign: "middle" }}>
-                    <img
-                      src={null1}
-                      alt="null"
-                      style={{
-                        marginRight: "5px",
-                        height: "15px",
-                        width: "15pxs",
-                      }}
-                    ></img>
-                  </span>
-                  null
-                </td>
-              </tr>
-              <tr>
-                <td>1</td>
-                <td>
-                  <img
-                    src={image}
-                    alt=""
-                    style={{
-                      height: "46px",
-                      width: "46px",
-                      objectFit: "contain",
-                      borderRadius: "50%",
-                      margin: "5px",
-                    }}
-                  ></img>
-                </td>
-                <td>Roy Thomas</td>
-                <td>M</td>
-                <td>2024-10-16 14:40:44</td>
-                <td>CP Mumbai</td>
-                <td>
-                  <span style={{ verticalAlign: "middle" }}>
-                    <img
-                      src={null1}
-                      alt="null"
-                      style={{
-                        marginRight: "5px",
-                        height: "15px",
-                        width: "15pxs",
-                      }}
-                    ></img>
-                  </span>
-                  null
-                </td>
-              </tr>
-              <tr>
-                <td>1</td>
-                <td>
-                  <img
-                    src={image}
-                    alt=""
-                    style={{
-                      height: "46px",
-                      width: "46px",
-                      objectFit: "contain",
-                      borderRadius: "50%",
-                      margin: "5px",
-                    }}
-                  ></img>
-                </td>
-                <td>Roy Thomas</td>
-                <td>M</td>
-                <td>2024-10-16 14:40:44</td>
-                <td>CP Mumbai</td>
-                <td>
-                  <span style={{ verticalAlign: "middle" }}>
-                    <img
-                      src={null1}
-                      alt="null"
-                      style={{
-                        marginRight: "5px",
-                        height: "15px",
-                        width: "15pxs",
-                      }}
-                    ></img>
-                  </span>
-                  null
-                </td>
-              </tr>
-              <tr>
-                <td>1</td>
-                <td>
-                  <img
-                    src={image}
-                    alt=""
-                    style={{
-                      height: "46px",
-                      width: "46px",
-                      objectFit: "contain",
-                      borderRadius: "50%",
-                      margin: "5px",
-                    }}
-                  ></img>
-                </td>
-                <td>Roy Thomas</td>
-                <td>M</td>
-                <td>2024-10-16 14:40:44</td>
-                <td>CP Mumbai</td>
-                <td>
-                  <span style={{ verticalAlign: "middle" }}>
-                    <img
-                      src={null1}
-                      alt="null"
-                      style={{
-                        marginRight: "5px",
-                        height: "15px",
-                        width: "15pxs",
-                      }}
-                    ></img>
-                  </span>
-                  null
-                </td>
-              </tr>
-              <tr>
-                <td>1</td>
-                <td>
-                  <img
-                    src={image}
-                    alt=""
-                    style={{
-                      height: "46px",
-                      width: "46px",
-                      objectFit: "contain",
-                      borderRadius: "50%",
-                      margin: "5px",
-                    }}
-                  ></img>
-                </td>
-                <td>Roy Thomas</td>
-                <td>M</td>
-                <td>2024-10-16 14:40:44</td>
-                <td>CP Mumbai</td>
-                <td>
-                  <span style={{ verticalAlign: "middle" }}>
-                    <img
-                      src={null1}
-                      alt="null"
-                      style={{
-                        marginRight: "5px",
-                        height: "15px",
-                        width: "15pxs",
-                      }}
-                    ></img>
-                  </span>
-                  null
-                </td>
-              </tr>
-              <tr>
-                <td>1</td>
-                <td>
-                  <img
-                    src={image}
-                    alt=""
-                    style={{
-                      height: "46px",
-                      width: "46px",
-                      objectFit: "contain",
-                      borderRadius: "50%",
-                      margin: "5px",
-                    }}
-                  ></img>
-                </td>
-                <td>Roy Thomas</td>
-                <td>M</td>
-                <td>2024-10-16 14:40:44</td>
-                <td>CP Mumbai</td>
-                <td>
-                  <span style={{ verticalAlign: "middle" }}>
-                    <img
-                      src={null1}
-                      alt="null"
-                      style={{
-                        marginRight: "5px",
-                        height: "15px",
-                        width: "15pxs",
-                      }}
-                    ></img>
-                  </span>
-                  null
-                </td>
-              </tr>
+              {detectionList.map((detection, index) => {
+                const formattedDate = new Date(
+                  detection.dateTime
+                ).toLocaleString();
+
+                const cover =
+                  detection.faceCover === "Mask"
+                    ? mask
+                    : detection.faceCover === "Cap"
+                    ? cap
+                    : null1;
+                return (
+                  <tr>
+                    <td>{index + 1}</td>
+                    <td>
+                      <img
+                        src={`${process.env.REACT_APP_BASE_URL}/${detection.imageUrl}`}
+                        alt=""
+                        style={{
+                          height: "46px",
+                          width: "46px",
+                          objectFit: "contain",
+                          borderRadius: "50%",
+                          margin: "5px",
+                        }}
+                      ></img>
+                    </td>
+                    <td>{detection.name}</td>
+                    <td>{detection.gender}</td>
+                    <td>{formattedDate}</td>
+                    <td>{detection.poc}</td>
+                    <td>
+                      <span style={{ verticalAlign: "middle" }}>
+                        <img
+                          src={cover}
+                          alt="null"
+                          style={{
+                            marginRight: "5px",
+                            height: "15px",
+                            width: "15pxs",
+                          }}
+                        ></img>
+                      </span>
+                      {detection.faceCover === "Mask"
+                        ? "Mask Detected"
+                        : detection.faceCover === "Cap"
+                        ? "Cap Detected"
+                        : "null"}
+                    </td>
+                  </tr>
+                );
+              })}
             </tbody>
           </table>
         </div>

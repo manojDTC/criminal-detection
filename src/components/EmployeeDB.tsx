@@ -48,9 +48,6 @@ const EmployeeDB = () => {
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   const [key, setKey] = useState<string | null>("1");
-  const employeeList: Employee[] = [];
-
-  const criminalList: Criminal[] = [];
 
   useEffect(() => {
     const fetchEmployees = async () => {
@@ -71,7 +68,7 @@ const EmployeeDB = () => {
     const fetchCriminals = async () => {
       try {
         const response = await axios.get<Criminal[]>(
-          `${process.env.REACT_APP_BASE_URL}/api/Person/GetCriminalsImagesAsync`
+          `${process.env.REACT_APP_BASE_URL}/api/Person/GetCriminalsImages`
         );
         setCriminal(response.data);
       } catch (error) {
@@ -125,10 +122,18 @@ const EmployeeDB = () => {
                         : "No Image";
                     return (
                       <tr key={employee.id}>
-                        <td>
+                        <td
+                          style={{
+                            display: "flex",
+                            justifyContent: "center",
+                            gap: "10px",
+                            alignItems: "center",
+                          }}
+                        >
                           <span>
                             <img
-                              src={`${process.env.REACT_APP_BASE_URL}${firstImageUrl}`}
+                              style={{ height: "40px", borderRadius: "50%" }}
+                              src={`${process.env.REACT_APP_BASE_URL}/${firstImageUrl}`}
                               alt=""
                             ></img>
                           </span>
@@ -180,10 +185,18 @@ const EmployeeDB = () => {
                         : "No Image";
                     return (
                       <tr key={criminal.id}>
-                        <td>
+                        <td
+                          style={{
+                            display: "flex",
+                            justifyContent: "center",
+                            gap: "10px",
+                            alignItems: "center",
+                          }}
+                        >
                           <span>
                             <img
-                              src={`${process.env.REACT_APP_BASE_URL}${firstImageUrl}`}
+                              style={{ height: "40px", borderRadius: "50%" }}
+                              src={`${process.env.REACT_APP_BASE_URL}/${firstImageUrl}`}
                               alt=""
                             ></img>
                           </span>

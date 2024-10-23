@@ -5,74 +5,109 @@ import cap from "../assets/cap.png";
 import mask from "../assets/mask.png";
 import null1 from "../assets/null.png";
 import axios from "axios";
+import { toast } from "react-toastify";
 
-interface CameraList {
-  cameraId: number;
-  cameratype: string;
-  cameraLocation: string;
-  cameraStatus: string;
+interface Camera {
+  id: string;
+  name: string;
+  area: string;
+  isActive: boolean;
+  customerId: string;
 }
 
+interface LiveDetection {
+  imageUrl: string;
+  gender: string;
+  details: string;
+  faceCover: string;
+}
+
+// interface
+
 const Live = () => {
-  const [cameraLists, setCameraLists] = useState<CameraList[]>([]);
-  const [selectedCamera, setSelectedCamera] = useState<CameraList | null>(null);
-  const [error, setError] = useState<string | null>(null);
-  const [loading, setLoading] = useState<boolean>(true);
-  const cameraList: CameraList[] = [
-    {
-      cameraId: 1,
-      cameratype: "Camera1",
-      cameraLocation: "Entrance1",
-      cameraStatus: "active",
-    },
-    {
-      cameraId: 12,
-      cameratype: "Camera2",
-      cameraLocation: "Entrance2",
-      cameraStatus: "active",
-    },
-    {
-      cameraId: 3,
-      cameratype: "Camera3",
-      cameraLocation: "Exit",
-      cameraStatus: "inactive",
-    },
-  ];
+  const [cameraLists, setCameraLists] = useState<Camera[]>([]);
+  const [selectedCamera, setSelectedCamera] = useState("");
+  const [selectedCameraDetails, setSelectedCameraDetails] =
+    useState<Camera | null>();
+  const [loading, setLoading] = useState<boolean>(false);
+  const [selectedCameraLiveUrl, setSelectedCameraLiveUrl] =
+    useState<string>("");
+  const [liveDetectionList, setLiveDetectionList] = useState<
+    LiveDetection[] | null
+  >(null);
+  const [selectedType, setSelectedType] = useState<string>("Criminal");
+  const [criminalDetectionList, setCriminalDetectionList] = useState<
+    LiveDetection[] | null
+  >(null);
 
   useEffect(() => {
-    // Fetch employee list on component mount
     const fetchCameraList = async () => {
+      setLoading(true);
       try {
-        // const response = await axios.get<CameraList[]>(
-        //   "https://api.example.com/cameralists"
-        // );
-        const response = cameraList;
-        //setEmployees(response.data);
-        setCameraLists(response);
+        const response = await axios.get<Camera[]>(
+          `${process.env.REACT_APP_BASE_URL}/api/Person/GetAllCameras`
+        );
+        setCameraLists(response.data);
+        setLoading(false);
       } catch (error) {
-        setError("Failed to load employees");
+        toast.error("Failed to load Camera's");
       } finally {
         setLoading(false);
       }
     };
 
     fetchCameraList();
+    fetchLiveDetections();
+    fetchCriminalDetections();
   }, []);
 
-  if (loading) {
-    return <div>Loading...</div>;
-  }
-
-  if (error) {
-    return <div>{error}</div>;
-  }
-
-  const test = (event: React.ChangeEvent<HTMLSelectElement>) => {
-    const selectedCameraType = event.target.value;
-    const camera = cameraLists.find(
-      (camera) => camera.cameratype === selectedCameraType
+  const getSelectedCamera = async (
+    event: React.ChangeEvent<HTMLSelectElement>
+  ) => {
+    setSelectedCameraLiveUrl("");
+    const cameraId = event.target.value;
+    const camera = cameraLists.find((camera) => camera.id === cameraId);
+    setSelectedCameraDetails(camera);
+    setSelectedCamera(cameraId);
+    const response = await axios.get(
+      `${process.env.REACT_APP_BASE_URL}/api/Person/GetLiveURL/cameraId=${cameraId}`
     );
-    setSelectedCamera(camera || null);
+
+    setSelectedCameraLiveUrl(response.data);
+    const intervalId = setInterval(fetchLiveDetections, 5000);
+    const criminalIntervalId = setInterval(fetchCriminalDetections, 5000);
+    return () => {
+      clearInterval(intervalId);
+      clearInterval(criminalIntervalId);
+    };
+  };
+
+  const getSelectedType = (event: React.ChangeEvent<HTMLSelectElement>) => {
+    setSelectedType(event.target.value);
+  };
+
+  const fetchLiveDetections = async () => {
+    try {
+      const response = await axios.get<LiveDetection[]>(
+        `${process.env.REACT_APP_BASE_URL}/api/Person/GetLiveDetection`
+      );
+
+      setLiveDetectionList(response.data);
+    } catch (error) {
+      toast.error("Failed to fetch live detection");
+    }
+  };
+
+  const fetchCriminalDetections = async () => {
+    try {
+      const response = await axios.get<LiveDetection[]>(
+        `${process.env.REACT_APP_BASE_URL}/api/Person/GetDetection?Type=${selectedType}`
+      );
+
+      setCriminalDetectionList(response.data);
+    } catch (error) {
+      toast.error("Failed to criminal live detection");
+    }
   };
 
   return (
@@ -114,77 +149,79 @@ const Live = () => {
                 border: "0",
                 marginTop: "10px",
               }}
-              onChange={test}
+              onChange={getSelectedCamera}
+              value={selectedCamera}
             >
+              <option value="" disabled>
+                Select Camera
+              </option>
               {cameraLists.map((camera) => (
-                <option key={camera.cameraId} value={camera.cameratype}>
-                  {camera.cameratype}
+                <option key={camera.id} value={camera.id}>
+                  {camera.name}
                 </option>
               ))}
             </select>
           </div>
-          {selectedCamera && (
+          <div
+            style={{
+              display: "flex",
+              gap: "20px",
+              alignItems: "center",
+              width: "100%",
+            }}
+          >
             <div
               style={{
-                display: "flex",
-                gap: "20px",
-                alignItems: "center",
-                width: "100%",
+                flex: "0  0 44%",
+                background: "white",
+                padding: "15px",
+                borderRadius: "6px",
               }}
             >
-              <div
+              <p style={{ marginTop: "0", fontSize: "14px" }}>
+                Camera Location
+              </p>
+              <p
                 style={{
-                  flex: "0  0 44%",
-                  background: "white",
-                  padding: "15px",
-                  borderRadius: "6px",
+                  padding: "10px",
+                  borderRadius: "4px",
+                  background: "#9333EA",
+                  fontSize: "14px",
+                  color: "white",
+                  fontWeight: "600",
+                  margin: "0",
+                  height: "19px",
                 }}
               >
-                <p style={{ marginTop: "0", fontSize: "14px" }}>
-                  Camera Location
-                </p>
-
-                <p
-                  style={{
-                    padding: "10px",
-                    borderRadius: "4px",
-                    background: "#9333EA",
-                    fontSize: "14px",
-                    color: "white",
-                    fontWeight: "600",
-                    margin: "0",
-                  }}
-                >
-                  {selectedCamera.cameraLocation}
-                </p>
-              </div>
-
-              <div
-                style={{
-                  flex: "0  0 44%",
-                  background: "white",
-                  padding: "15px",
-                  borderRadius: "6px",
-                }}
-              >
-                <p style={{ marginTop: "0", fontSize: "14px" }}>Status</p>
-                <p
-                  style={{
-                    padding: "10px",
-                    borderRadius: "4px",
-                    background: "#8AC53E",
-
-                    fontSize: "14px",
-                    color: "white",
-                    fontWeight: "600",
-                    margin: "0",
-                  }}
-                >
-                  {selectedCamera.cameraStatus}
-                </p>
-              </div>
+                {selectedCameraDetails && selectedCameraDetails.area}
+              </p>
             </div>
-          )}
+            <div
+              style={{
+                flex: "0  0 44%",
+                background: "white",
+                padding: "15px",
+                borderRadius: "6px",
+              }}
+            >
+              <p style={{ marginTop: "0", fontSize: "14px" }}>Status</p>
+              <p
+                style={{
+                  padding: "10px",
+                  borderRadius: "4px",
+                  background: "#8AC53E",
+
+                  fontSize: "14px",
+                  color: "white",
+                  fontWeight: "600",
+                  margin: "0",
+                  height: "19px",
+                }}
+              >
+                {selectedCameraDetails?.isActive ? "Active" : "Not Active"}
+              </p>
+            </div>
+          </div>
           <div
             style={{
               background: "white",
@@ -194,7 +231,27 @@ const Live = () => {
             }}
           >
             <p>Live Feed</p>
-            <iframe title="live feed" src="" style={{ width: "100%" }}></iframe>
+            <div style={{ position: "relative" }}>
+              {loading ? (
+                <p
+                  style={{
+                    position: "absolute",
+                    top: "40%",
+                    width: "100%",
+                    textAlign: "center",
+                  }}
+                >
+                  loading... Please wait
+                </p>
+              ) : (
+                ""
+              )}
+              <iframe
+                title="live feed"
+                src={selectedCameraLiveUrl}
+                style={{ width: "100%" }}
+              ></iframe>
+            </div>
           </div>
         </div>
         <div style={{ flex: "0 0 50%" }}>
@@ -220,11 +277,11 @@ const Live = () => {
                   border: "0",
                   marginTop: "10px",
                 }}
+                onChange={getSelectedType}
+                value={selectedType}
               >
-                <option value="criminal">Criminal</option>
-                <option value="saab">Saab</option>
-                <option value="mercedes">Mercedes</option>
-                <option value="audi">Audi</option>
+                <option value="Criminal">Criminal</option>
+                <option value="VIP">VIP</option>
               </select>
               <div style={{ height: "250px", overflow: "scroll" }}>
                 <table className="dbtable criminaltable">
@@ -235,135 +292,49 @@ const Live = () => {
                       <th>Details</th>
                       <th>Face Coverage</th>
                     </tr>
-                    <tr>
-                      <td>
-                        <img
-                          src={image}
-                          alt=""
-                          style={{
-                            height: "66px",
-                            width: "66px",
-                            objectFit: "contain",
-                          }}
-                        ></img>
-                      </td>
-                      <td>M</td>
-                      <td>E-101</td>
-                      <td>
-                        <span style={{ verticalAlign: "middle" }}>
-                          <img
-                            src={null1}
-                            alt="null"
-                            style={{
-                              marginRight: "5px",
-                              height: "15px",
-                              width: "15pxs",
-                            }}
-                          ></img>
-                        </span>
-                        null
-                      </td>
-                    </tr>
-                    <tr>
-                      <td>
-                        <img
-                          src={image1}
-                          alt=""
-                          style={{
-                            height: "66px",
-                            width: "66px",
-                            objectFit: "contain",
-                          }}
-                        ></img>
-                      </td>
-                      <td>M</td>
-                      <td>E-101</td>
-                      <td>
-                        <span style={{ verticalAlign: "middle" }}>
-                          <img
-                            src={cap}
-                            alt="cap"
-                            style={{
-                              marginRight: "5px",
-                              height: "15px",
-                              width: "15pxs",
-                            }}
-                          ></img>
-                        </span>
-                        null
-                      </td>
-                    </tr>
-                    <tr>
-                      <td>
-                        <img
-                          src={image}
-                          alt=""
-                          style={{
-                            height: "66px",
-                            width: "66px",
-                            objectFit: "contain",
-                          }}
-                        ></img>
-                      </td>
-                      <td>M</td>
-                      <td>E-101</td>
-                      <td>
-                        <span style={{ verticalAlign: "middle" }}>
-                          <img
-                            src={mask}
-                            alt="mask"
-                            style={{
-                              marginRight: "5px",
-                              height: "15px",
-                              width: "15pxs",
-                            }}
-                          ></img>
-                        </span>
-                        null
-                      </td>
-                    </tr>
-                    <tr>
-                      <td>
-                        <img
-                          src={image}
-                          alt=""
-                          style={{
-                            height: "66px",
-                            width: "66px",
-                            objectFit: "contain",
-                          }}
-                        ></img>
-                      </td>
-                      <td>M</td>
-                      <td>E-101</td>
-                      <td>
-                        <span>
-                          <img src={null1} alt="null"></img>
-                        </span>
-                        null
-                      </td>
-                    </tr>
-                    <tr>
-                      <td>
-                        <img
-                          src={image}
-                          alt=""
-                          style={{
-                            height: "66px",
-                            width: "66px",
-                            objectFit: "contain",
-                          }}
-                        ></img>
-                      </td>
-                      <td>M</td>
-                      <td>E-101</td>
-                      <td>
-                        <span>
-                          <img src={null1} alt="null"></img>
-                        </span>
-                        null
-                      </td>
-                    </tr>
+                    {criminalDetectionList?.map((criminalDetection) => {
+                      const cover =
+                        criminalDetection.faceCover === "Mask"
+                          ? mask
+                          : criminalDetection.faceCover === "Cap"
+                          ? cap
+                          : null1;
+                      return (
+                        <tr>
+                          <td>
+                            <img
+                              src={criminalDetection.imageUrl}
+                              alt=""
+                              style={{
+                                height: "66px",
+                                width: "66px",
+                                objectFit: "contain",
+                              }}
+                            ></img>
+                          </td>
+                          <td>{criminalDetection.gender}</td>
+                          <td>{criminalDetection.details}</td>
+                          <td>
+                            <span style={{ verticalAlign: "middle" }}>
+                              <img
+                                src={cover}
+                                alt="null"
+                                style={{
+                                  marginRight: "5px",
+                                  height: "15px",
+                                  width: "15pxs",
+                                }}
+                              ></img>
+                            </span>
+                            {criminalDetection.faceCover === "Mask"
+                              ? "Mask Detected"
+                              : criminalDetection.faceCover === "Cap"
+                              ? "Cap Detected"
+                              : "null"}
+                          </td>
+                        </tr>
+                      );
+                    })}
                   </tbody>
                 </table>
               </div>
@@ -383,7 +354,7 @@ const Live = () => {
                 Live Detections
               </p>
               <div style={{ height: "250px", overflow: "scroll" }}>
-                <table className="dbtable criminaltable">
+                <table className="dbtable livetable">
                   <tbody>
                     <tr>
                       <th>Captured</th>
@@ -391,135 +362,49 @@ const Live = () => {
                       <th>Details</th>
                       <th>Face Coverage</th>
                     </tr>
-                    <tr>
-                      <td>
-                        <img
-                          src={image}
-                          alt=""
-                          style={{
-                            height: "66px",
-                            width: "66px",
-                            objectFit: "contain",
-                          }}
-                        ></img>
-                      </td>
-                      <td>M</td>
-                      <td>E-101</td>
-                      <td>
-                        <span style={{ verticalAlign: "middle" }}>
-                          <img
-                            src={null1}
-                            alt="null"
-                            style={{
-                              marginRight: "5px",
-                              height: "15px",
-                              width: "15pxs",
-                            }}
-                          ></img>
-                        </span>
-                        null
-                      </td>
-                    </tr>
-                    <tr>
-                      <td>
-                        <img
-                          src={image1}
-                          alt=""
-                          style={{
-                            height: "66px",
-                            width: "66px",
-                            objectFit: "contain",
-                          }}
-                        ></img>
-                      </td>
-                      <td>M</td>
-                      <td>E-101</td>
-                      <td>
-                        <span style={{ verticalAlign: "middle" }}>
-                          <img
-                            src={cap}
-                            alt="cap"
-                            style={{
-                              marginRight: "5px",
-                              height: "15px",
-                              width: "15pxs",
-                            }}
-                          ></img>
-                        </span>
-                        null
-                      </td>
-                    </tr>
-                    <tr>
-                      <td>
-                        <img
-                          src={image}
-                          alt=""
-                          style={{
-                            height: "66px",
-                            width: "66px",
-                            objectFit: "contain",
-                          }}
-                        ></img>
-                      </td>
-                      <td>M</td>
-                      <td>E-101</td>
-                      <td>
-                        <span style={{ verticalAlign: "middle" }}>
-                          <img
-                            src={mask}
-                            alt="mask"
-                            style={{
-                              marginRight: "5px",
-                              height: "15px",
-                              width: "15pxs",
-                            }}
-                          ></img>
-                        </span>
-                        null
-                      </td>
-                    </tr>
-                    <tr>
-                      <td>
-                        <img
-                          src={image}
-                          alt=""
-                          style={{
-                            height: "66px",
-                            width: "66px",
-                            objectFit: "contain",
-                          }}
-                        ></img>
-                      </td>
-                      <td>M</td>
-                      <td>E-101</td>
-                      <td>
-                        <span>
-                          <img src={null1} alt="null"></img>
-                        </span>
-                        null
-                      </td>
-                    </tr>
-                    <tr>
-                      <td>
-                        <img
-                          src={image}
-                          alt=""
-                          style={{
-                            height: "66px",
-                            width: "66px",
-                            objectFit: "contain",
-                          }}
-                        ></img>
-                      </td>
-                      <td>M</td>
-                      <td>E-101</td>
-                      <td>
-                        <span>
-                          <img src={null1} alt="null"></img>
-                        </span>
-                        null
-                      </td>
-                    </tr>
+                    {liveDetectionList?.map((livedetection, index) => {
+                      const cover =
+                        livedetection.faceCover === "Mask"
+                          ? mask
+                          : livedetection.faceCover === "Cap"
+                          ? cap
+                          : null1;
+                      return (
+                        <tr key={index}>
+                          <td>
+                            <img
+                              src={livedetection.imageUrl}
+                              alt=""
+                              style={{
+                                height: "66px",
+                                width: "66px",
+                                objectFit: "contain",
+                              }}
+                            ></img>
+                          </td>
+                          <td>{livedetection.gender}</td>
+                          <td>{livedetection.details}</td>
+                          <td>
+                            <span style={{ verticalAlign: "middle" }}>
+                              <img
+                                src={cover}
+                                alt="null"
+                                style={{
+                                  marginRight: "5px",
+                                  height: "15px",
+                                  width: "15pxs",
+                                }}
+                              ></img>
+                            </span>
+                            {livedetection.faceCover === "Mask"
+                              ? "Mask Detected"
+                              : livedetection.faceCover === "Cap"
+                              ? "Cap Detected"
+                              : "null"}
+                          </td>
+                        </tr>
+                      );
+                    })}
                   </tbody>
                 </table>
               </div>
