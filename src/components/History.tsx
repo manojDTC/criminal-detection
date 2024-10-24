@@ -281,7 +281,7 @@ const History = () => {
                     <td>{index + 1}</td>
                     <td>
                       <img
-                        src={`${process.env.REACT_APP_BASE_URL}/${detection.imageUrl}`}
+                        src={"data:image/jpeg;base64, " + detection.imageUrl}
                         alt=""
                         style={{
                           height: "46px",

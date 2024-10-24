@@ -303,7 +303,10 @@ const Live = () => {
                         <tr>
                           <td>
                             <img
-                              src={criminalDetection.imageUrl}
+                              src={
+                                "data:image/jpeg;base64, " +
+                                criminalDetection.imageUrl
+                              }
                               alt=""
                               style={{
                                 height: "66px",
@@ -373,7 +376,10 @@ const Live = () => {
                         <tr key={index}>
                           <td>
                             <img
-                              src={livedetection.imageUrl}
+                              src={
+                                "data:image/jpeg;base64, " +
+                                livedetection.imageUrl
+                              }
                               alt=""
                               style={{
                                 height: "66px",

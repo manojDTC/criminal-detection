@@ -1,6 +1,19 @@
-import React from "react";
+import { useEffect, useState } from "react";
+
+interface Alert {
+  alert: string;
+  dateTime: Date;
+  name: string;
+  location: string;
+  cameraName: string;
+}
 
 const Alert = () => {
+  const [alerts, setAlerts] = useState<Alert[]>([]);
+
+  const markAsFalse = () => {
+    console.log("hi");
+  };
   return (
     <div
       style={{
@@ -36,22 +49,26 @@ const Alert = () => {
               <th>Camera Name</th>
               <th>Action</th>
             </tr>
+            {alerts.map((alert) => {
+              return (
+                <tr>
+                  <td>{alert.alert}</td>
+                  {/* <td>{alert.dateTime}</td> */}
+                  <td>
+                    <span>
+                      <img src="" alt=""></img>
+                    </span>
+                    {alert.name}
+                  </td>
+                  <td>{alert.location}</td>
+                  <td>{alert.cameraName}</td>
+                  <td>
+                    <button onClick={markAsFalse}>Mark as False</button>
+                  </td>
+                </tr>
+              );
+            })}
 
-            <tr>
-              <td>Ronald Richards details Matching @ location: Entrance</td>
-              <td>2024-10-16 14:40:44</td>
-              <td>
-                <span>
-                  <img src="" alt=""></img>
-                </span>
-                Ronald Richards
-              </td>
-              <td>Entrance</td>
-              <td>Cam- 001</td>
-              <td>
-                <button>Mark as False</button>
-              </td>
-            </tr>
             <tr>
               <td>Ronald Richards details Matching @ location: Entrance</td>
               <td>2024-10-16 14:40:44</td>

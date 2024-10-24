@@ -51,9 +51,8 @@ const AppRoutes = () => {
               </Layout>
             }
           />
-
           <Route
-            path="/Alert"
+            path="/alert"
             element={
               <Layout>
                 <Alert />

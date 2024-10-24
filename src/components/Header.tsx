@@ -18,7 +18,9 @@ const Header = () => {
         </Link>
       </div>
       <div>
-        <img src={notify} alt="notify"></img>
+        <Link to="/alert">
+          <img src={notify} alt="notify"></img>
+        </Link>
       </div>
     </div>
   );
