@@ -48,6 +48,7 @@ const EmployeeDB = () => {
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   const [key, setKey] = useState<string | null>("1");
+  const [isOpen, setIsOpen] = useState<boolean>(false);
 
   useEffect(() => {
     const fetchEmployees = async () => {
@@ -90,6 +91,16 @@ const EmployeeDB = () => {
 
   const callback = (key: string) => {
     setKey(key);
+  };
+
+  // Open modal
+  const openModal = () => {
+    setIsOpen(true);
+  };
+
+  // Close modal
+  const closeModal = () => {
+    setIsOpen(false);
   };
 
   const items = [
@@ -249,6 +260,7 @@ const EmployeeDB = () => {
             padding: "10px",
             cursor: "pointer",
           }}
+          onClick={openModal}
         >
           Add Employee
         </button>
@@ -261,6 +273,85 @@ const EmployeeDB = () => {
         onChange={callback}
         style={{ color: "black" }}
       />
+      {isOpen && (
+        <div className="modal">
+          <div className="modal-content">
+            <span className="close" onClick={closeModal}>
+              &times;
+            </span>
+            <h2>Add Employee</h2>
+            <form>
+              <div>
+                <label htmlFor="name">UserName</label>
+                <input type="text" id="name" name="name" required />
+              </div>
+              <div>
+                <label htmlFor="email">Email:</label>
+                <input type="email" id="email" name="email" required />
+              </div>
+              <div>
+                <label htmlFor="role">Role:</label>
+                <input type="text" id="role" name="role" required />
+              </div>
+              <div>
+                <label htmlFor="employeeId">Employee ID:</label>
+                <input type="text" id="employeeId" name="employeeId" required />
+              </div>
+              <div>
+                <label htmlFor="contact">Contact:</label>
+                <input type="" id="contact" name="contact" required />
+              </div>
+              <div>
+                <label htmlFor="language">Language:</label>
+                <select id="language" name="language">
+                  <option value="en">English</option>
+                  <option value="fr">French</option>
+                  <option value="es">Spanish</option>
+                  <option value="de">German</option>
+                  <option value="zh">Chinese</option>
+                </select>
+              </div>
+              <div>
+                <label htmlFor="country">Country:</label>
+                <select id="country" name="country">
+                  <option value="usa">United States</option>
+                  <option value="canada">Canada</option>
+                  <option value="uk">United Kingdom</option>
+                  <option value="australia">Australia</option>
+                  <option value="india">India</option>
+                </select>
+              </div>
+              <div>
+                <label htmlFor="photo">Photo:</label>
+                <input
+                  type="file"
+                  id="photo"
+                  name="photo"
+                  accept=".png , .jpg , jpeg"
+                  multiple
+                />
+              </div>
+              <div style={{ justifyContent: "right" }}>
+                <button
+                  type="submit"
+                  style={{
+                    height: "40px",
+                    background: "#369FFF",
+                    border: "0",
+                    outline: "none",
+                    color: "white",
+                    padding: "10px",
+                    cursor: "pointer",
+                    width: "100px",
+                  }}
+                >
+                  Add
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

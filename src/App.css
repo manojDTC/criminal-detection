@@ -313,7 +313,7 @@ body {
   top: 0;
   width: 100%;
   height: 100%;
-  background-color: rgba(0, 0, 0, 0.5);
+  background-color: rgba(46, 45, 45, 0.23);
 }
 
 /* Modal Content */
@@ -322,11 +322,12 @@ body {
   margin: auto;
   padding: 20px;
   border: 1px solid #888;
-  width: 600px;
+  width: 700px;
   margin-top: 60px;
+  border-radius: 6px;
 }
 .modal-content div {
-  padding: 10px 0;
+  padding: 13px 0;
   display: flex;
   align-items: center;
 }
@@ -334,10 +335,14 @@ body {
   width: 110px;
   display: inline-block;
 }
-.modal-content div input {
-  flex: 1;
-  padding: 8px;
+.modal-content div input,
+.modal-content div select {
+  flex: 1 1;
+  padding: 9px;
   width: max-content;
+  border: 0;
+  background: #c9c6c62a;
+  border-radius: 3px;
 }
 /* Close Button */
 .close {

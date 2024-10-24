@@ -63,12 +63,26 @@ const History = () => {
   const fetchHistory = async () => {
     try {
       setLoading(true);
+      let Fdate, Tdate;
+      if (fromDate) {
+        const tmpdate1 = new Date(fromDate);
+        Fdate = tmpdate1.toISOString();
+      }
+
+      if (toDate) {
+        const tmpdate2 = new Date(toDate);
+        Tdate = tmpdate2.toISOString();
+      }
+
       const data = {
-        cameraId: "3fa85f64-5717-4562-b3fc-2c963f66afa6",
-        fromDate: "2024-10-23T09:40:54.809Z",
-        todate: "2024-10-23T09:40:54.809Z",
-        type: "string",
+        cameraId: selectedCamera,
+        fromDate: Fdate,
+        todate: Tdate,
+        type: selectedPersonType,
       };
+
+      console.log(data);
+
       const response = await axios.post<History[]>(
         `${process.env.REACT_APP_BASE_URL}/api/Person/GetHistory`,
         data
