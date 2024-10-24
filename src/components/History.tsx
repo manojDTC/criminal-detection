@@ -30,8 +30,8 @@ const History = () => {
   const [loading, setLoading] = useState<boolean>(true);
   // const [fromDate, setFromDate] = useState<Date | null>(new Date());
   // const [toDate, setToDate] = useState<Date | null>(new Date());
-  const [fromDate, setFromDate] = useState<Date | undefined>(undefined);
-  const [toDate, setToDate] = useState<Date | undefined>(undefined);
+  const [fromDate, setFromDate] = useState<Date | undefined>(new Date());
+  const [toDate, setToDate] = useState<Date | undefined>(new Date());
   const [cameraList, setCameraList] = useState<Camera[]>([]);
   const [selectedCamera, setSelectedCamera] = useState("");
   const [personType, setPersonType] = useState<string[]>([]);

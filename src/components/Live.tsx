@@ -6,6 +6,8 @@ import mask from "../assets/mask.png";
 import null1 from "../assets/null.png";
 import axios from "axios";
 import { toast } from "react-toastify";
+import star from "../assets/start.png";
+import tick from "../assets/tick.png";
 
 interface Camera {
   id: string;
@@ -39,6 +41,7 @@ const Live = () => {
   const [criminalDetectionList, setCriminalDetectionList] = useState<
     LiveDetection[] | null
   >(null);
+  const [isOpen, setIsOpen] = useState<boolean>(false);
 
   useEffect(() => {
     const fetchCameraList = async () => {
@@ -57,8 +60,6 @@ const Live = () => {
     };
 
     fetchCameraList();
-    fetchLiveDetections();
-    fetchCriminalDetections();
   }, []);
 
   const getSelectedCamera = async (
@@ -69,11 +70,18 @@ const Live = () => {
     const camera = cameraLists.find((camera) => camera.id === cameraId);
     setSelectedCameraDetails(camera);
     setSelectedCamera(cameraId);
-    const response = await axios.get(
-      `${process.env.REACT_APP_BASE_URL}/api/Person/GetLiveURL/cameraId=${cameraId}`
-    );
+    setLiveDetectionList([]);
+    setCriminalDetectionList([]);
 
-    setSelectedCameraLiveUrl(response.data);
+    try {
+      const response = await axios.get(
+        `${process.env.REACT_APP_BASE_URL}/api/Person/GetLiveURL?cameraId=${cameraId}`
+      );
+      setSelectedCameraLiveUrl(response.data);
+    } catch (error) {
+      toast.error("Failed to fetch live feed");
+    }
+
     const intervalId = setInterval(fetchLiveDetections, 5000);
     const criminalIntervalId = setInterval(fetchCriminalDetections, 5000);
     return () => {
@@ -84,6 +92,7 @@ const Live = () => {
 
   const getSelectedType = (event: React.ChangeEvent<HTMLSelectElement>) => {
     setSelectedType(event.target.value);
+    fetchCriminalDetections(event.target.value);
   };
 
   const fetchLiveDetections = async () => {
@@ -98,16 +107,25 @@ const Live = () => {
     }
   };
 
-  const fetchCriminalDetections = async () => {
+  const fetchCriminalDetections = async (type: string = "Criminal") => {
     try {
       const response = await axios.get<LiveDetection[]>(
-        `${process.env.REACT_APP_BASE_URL}/api/Person/GetDetection?Type=${selectedType}`
+        `${process.env.REACT_APP_BASE_URL}/api/Person/GetDetection?Type=${type}`
       );
 
       setCriminalDetectionList(response.data);
     } catch (error) {
       toast.error("Failed to criminal live detection");
     }
+  };
+
+  const openModal = () => {
+    setIsOpen(true);
+  };
+
+  // Close modal
+  const closeModal = () => {
+    setIsOpen(false);
   };
 
   return (
@@ -230,7 +248,7 @@ const Live = () => {
               marginTop: "10px",
             }}
           >
-            <p>Live Feed</p>
+            <p style={{ marginTop: "0px" }}>Live Feed</p>
             <div style={{ position: "relative" }}>
               {loading ? (
                 <p
@@ -249,7 +267,7 @@ const Live = () => {
               <iframe
                 title="live feed"
                 src={selectedCameraLiveUrl}
-                style={{ width: "100%" }}
+                style={{ width: "100%", height: "360px" }}
               ></iframe>
             </div>
           </div>
@@ -300,7 +318,7 @@ const Live = () => {
                           ? cap
                           : null1;
                       return (
-                        <tr>
+                        <tr key={criminalDetection.imageUrl}>
                           <td>
                             <img
                               src={
@@ -309,8 +327,8 @@ const Live = () => {
                               }
                               alt=""
                               style={{
-                                height: "66px",
-                                width: "66px",
+                                height: "46px",
+                                width: "46px",
                                 objectFit: "contain",
                               }}
                             ></img>
@@ -373,7 +391,7 @@ const Live = () => {
                           ? cap
                           : null1;
                       return (
-                        <tr key={index}>
+                        <tr key={index} onClick={openModal}>
                           <td>
                             <img
                               src={
@@ -382,8 +400,8 @@ const Live = () => {
                               }
                               alt=""
                               style={{
-                                height: "66px",
-                                width: "66px",
+                                height: "46px",
+                                width: "46px",
                                 objectFit: "contain",
                               }}
                             ></img>
@@ -418,6 +436,425 @@ const Live = () => {
           </div>
         </div>
       </div>
+      {isOpen && (
+        <div className="modal timelineModal">
+          <div className="modal-content timelineModal-content">
+            <span className="close" onClick={closeModal}>
+              &times;
+            </span>
+            <div
+              style={{
+                background: "white",
+                padding: "20px 15px ",
+                borderRadius: "6px",
+                marginBottom: "15px",
+              }}
+            >
+              <div style={{ display: "flex", gap: "20px", marginTop: "10px" }}>
+                <div>
+                  <label htmlFor="camera">Date From</label>
+                  <br></br>
+
+                  <select
+                    name="camera"
+                    id="camera"
+                    style={{
+                      width: "300px",
+                      padding: "10px",
+                      background: "#EEF0F3",
+
+                      borderRadius: "4px",
+                      border: "0",
+                      marginTop: "10px",
+                    }}
+                  >
+                    <option value="volvo">Volvo</option>
+                    <option value="saab">Saab</option>
+                    <option value="mercedes">Mercedes</option>
+                    <option value="audi">Audi</option>
+                  </select>
+                </div>
+                <div>
+                  <label htmlFor="camera">Date From</label>
+                  <br></br>
+
+                  <select
+                    name="camera"
+                    id="camera"
+                    style={{
+                      width: "300px",
+                      padding: "10px",
+                      background: "#EEF0F3",
+                      borderRadius: "4px",
+                      border: "0",
+                      marginTop: "10px",
+                    }}
+                  >
+                    <option value="volvo">Volvo</option>
+                    <option value="saab">Saab</option>
+                    <option value="mercedes">Mercedes</option>
+                    <option value="audi">Audi</option>
+                  </select>
+                </div>
+              </div>
+              <div
+                style={{
+                  display: "flex",
+                  gap: "20px",
+                  alignItems: "center",
+                  width: "100%",
+                  margin: "10px 0",
+                }}
+              >
+                <div
+                  style={{ display: "flex", alignItems: "center", gap: "5px" }}
+                >
+                  <img
+                    src={image}
+                    alt="profile"
+                    style={{
+                      borderRadius: "50%",
+                      height: "66px",
+                      width: "66px",
+                      objectFit: "contain",
+                    }}
+                  ></img>
+                  <div>
+                    <p style={{ margin: "0", fontSize: "14px" }}>
+                      William Jhonson
+                    </p>
+                    <span style={{ fontSize: "8px" }}>Criminal</span>
+                  </div>
+                </div>
+                <div
+                  style={{ display: "flex", alignItems: "center", gap: "5px" }}
+                >
+                  <img
+                    src={star}
+                    alt="star"
+                    style={{
+                      height: "30px",
+                      width: "30px",
+                      objectFit: "contain",
+                    }}
+                  ></img>
+                  <div>
+                    <p style={{ margin: "0", fontSize: "14px" }}>CBI</p>
+                    <span style={{ fontSize: "8px" }}>Issued By</span>
+                  </div>
+                </div>
+                <div
+                  style={{ display: "flex", alignItems: "center", gap: "5px" }}
+                >
+                  <img
+                    src={tick}
+                    alt="tick"
+                    style={{
+                      height: "30px",
+                      width: "30px",
+                      objectFit: "contain",
+                    }}
+                  ></img>
+                  <div>
+                    <p style={{ margin: "0", fontSize: "14px" }}>
+                      CP Bengaluru
+                    </p>
+                    <span style={{ fontSize: "8px" }}>POC</span>
+                  </div>
+                </div>
+                <div>
+                  <p style={{ fontSize: "12px" }}>
+                    <b>Suspected ID</b>: 101
+                  </p>
+                </div>
+                <div>
+                  <p style={{ fontSize: "12px" }}>
+                    <b>Origin City</b>: London
+                  </p>
+                </div>
+                <div>
+                  <p style={{ fontSize: "12px" }}>
+                    <b>Crime</b>: Robbery
+                  </p>
+                </div>
+                <div>
+                  <p style={{ fontSize: "12px" }}>
+                    <b>Langauage</b>: English
+                  </p>
+                </div>
+                <div>
+                  <p style={{ fontSize: "12px" }}>
+                    <b>Country</b>: England
+                  </p>
+                </div>
+              </div>
+            </div>
+            <div
+              style={{
+                background: "white",
+                padding: "20px 15px ",
+                borderRadius: "6px",
+                marginBottom: "15px",
+                height: "calc(100vh - 330px)",
+                overflow: "scroll",
+              }}
+            >
+              <div
+                style={{
+                  display: "grid",
+                  gridTemplateColumns: "repeat(4, 1fr)",
+                  gridGap: "20px",
+                  justifyItems: "center",
+                }}
+              >
+                <div>
+                  <img
+                    src={image}
+                    alt=""
+                    style={{
+                      height: "80px",
+                      width: "80px",
+                      borderRadius: "50%",
+                      border: "5px solid purple",
+                    }}
+                  ></img>
+                  <div>
+                    <p
+                      style={{
+                        color: "black",
+                        fontWeight: "600",
+                        fontSize: "14px",
+                        margin: "5px 0",
+                      }}
+                    >
+                      10:00AM 12/08/24
+                    </p>
+                    <span style={{ fontSize: "10px" }}>Camera 1</span>
+                    <br></br>
+                    <span style={{ fontSize: "10px" }}>Entrance</span>
+                  </div>
+                </div>
+                <div>
+                  <img
+                    src={image}
+                    alt=""
+                    style={{
+                      height: "80px",
+                      width: "80px",
+                      borderRadius: "50%",
+                      border: "5px solid purple",
+                    }}
+                  ></img>
+                  <div>
+                    <p
+                      style={{
+                        color: "black",
+                        fontWeight: "600",
+                        fontSize: "14px",
+                        margin: "5px 0",
+                      }}
+                    >
+                      10:00AM 12/08/24
+                    </p>
+                    <span style={{ fontSize: "10px" }}>Camera 1</span>
+                    <br></br>
+                    <span style={{ fontSize: "10px" }}>Entrance</span>
+                  </div>
+                </div>
+                <div>
+                  <img
+                    src={image}
+                    alt=""
+                    style={{
+                      height: "80px",
+                      width: "80px",
+                      borderRadius: "50%",
+                      border: "5px solid purple",
+                    }}
+                  ></img>
+                  <div>
+                    <p
+                      style={{
+                        color: "black",
+                        fontWeight: "600",
+                        fontSize: "14px",
+                        margin: "5px 0",
+                      }}
+                    >
+                      10:00AM 12/08/24
+                    </p>
+                    <span style={{ fontSize: "10px" }}>Camera 1</span>
+                    <br></br>
+                    <span style={{ fontSize: "10px" }}>Entrance</span>
+                  </div>
+                </div>
+                <div>
+                  <img
+                    src={image}
+                    alt=""
+                    style={{
+                      height: "80px",
+                      width: "80px",
+                      borderRadius: "50%",
+                      border: "5px solid purple",
+                    }}
+                  ></img>
+                  <div>
+                    <p
+                      style={{
+                        color: "black",
+                        fontWeight: "600",
+                        fontSize: "14px",
+                        margin: "5px 0",
+                      }}
+                    >
+                      10:00AM 12/08/24
+                    </p>
+                    <span style={{ fontSize: "10px" }}>Camera 1</span>
+                    <br></br>
+                    <span style={{ fontSize: "10px" }}>Entrance</span>
+                  </div>
+                </div>
+                <div>
+                  <img
+                    src={image}
+                    alt=""
+                    style={{
+                      height: "80px",
+                      width: "80px",
+                      borderRadius: "50%",
+                      border: "5px solid purple",
+                    }}
+                  ></img>
+                  <div>
+                    <p
+                      style={{
+                        color: "black",
+                        fontWeight: "600",
+                        fontSize: "14px",
+                        margin: "5px 0",
+                      }}
+                    >
+                      10:00AM 12/08/24
+                    </p>
+                    <span style={{ fontSize: "10px" }}>Camera 1</span>
+                    <br></br>
+                    <span style={{ fontSize: "10px" }}>Entrance</span>
+                  </div>
+                </div>
+                <div>
+                  <img
+                    src={image}
+                    alt=""
+                    style={{
+                      height: "80px",
+                      width: "80px",
+                      borderRadius: "50%",
+                      border: "5px solid purple",
+                    }}
+                  ></img>
+                  <div>
+                    <p
+                      style={{
+                        color: "black",
+                        fontWeight: "600",
+                        fontSize: "14px",
+                        margin: "5px 0",
+                      }}
+                    >
+                      10:00AM 12/08/24
+                    </p>
+                    <span style={{ fontSize: "10px" }}>Camera 1</span>
+                    <br></br>
+                    <span style={{ fontSize: "10px" }}>Entrance</span>
+                  </div>
+                </div>
+                <div>
+                  <img
+                    src={image}
+                    alt=""
+                    style={{
+                      height: "80px",
+                      width: "80px",
+                      borderRadius: "50%",
+                      border: "5px solid purple",
+                    }}
+                  ></img>
+                  <div>
+                    <p
+                      style={{
+                        color: "black",
+                        fontWeight: "600",
+                        fontSize: "14px",
+                        margin: "5px 0",
+                      }}
+                    >
+                      10:00AM 12/08/24
+                    </p>
+                    <span style={{ fontSize: "10px" }}>Camera 1</span>
+                    <br></br>
+                    <span style={{ fontSize: "10px" }}>Entrance</span>
+                  </div>
+                </div>
+                <div>
+                  <img
+                    src={image}
+                    alt=""
+                    style={{
+                      height: "80px",
+                      width: "80px",
+                      borderRadius: "50%",
+                      border: "5px solid purple",
+                    }}
+                  ></img>
+                  <div>
+                    <p
+                      style={{
+                        color: "black",
+                        fontWeight: "600",
+                        fontSize: "14px",
+                        margin: "5px 0",
+                      }}
+                    >
+                      10:00AM 12/08/24
+                    </p>
+                    <span style={{ fontSize: "10px" }}>Camera 1</span>
+                    <br></br>
+                    <span style={{ fontSize: "10px" }}>Entrance</span>
+                  </div>
+                </div>
+                <div>
+                  <img
+                    src={image}
+                    alt=""
+                    style={{
+                      height: "80px",
+                      width: "80px",
+                      borderRadius: "50%",
+                      border: "5px solid purple",
+                    }}
+                  ></img>
+                  <div>
+                    <p
+                      style={{
+                        color: "black",
+                        fontWeight: "600",
+                        fontSize: "14px",
+                        margin: "5px 0",
+                      }}
+                    >
+                      10:00AM 12/08/24
+                    </p>
+                    <span style={{ fontSize: "10px" }}>Camera 1</span>
+                    <br></br>
+                    <span style={{ fontSize: "10px" }}>Entrance</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

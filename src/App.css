@@ -317,7 +317,7 @@ body {
 }
 
 /* Modal Content */
-.modal-content {
+.modal-content.employeeModal-content {
   background-color: white;
   margin: auto;
   padding: 20px;
@@ -326,17 +326,17 @@ body {
   margin-top: 60px;
   border-radius: 6px;
 }
-.modal-content div {
+.modal-content.employeeModal-content div {
   padding: 13px 0;
   display: flex;
   align-items: center;
 }
-.modal-content div label {
+.modal-content.employeeModal-content div label {
   width: 110px;
   display: inline-block;
 }
-.modal-content div input,
-.modal-content div select {
+.modal-content.employeeModal-content div input,
+.modal-content.employeeModal-content div select {
   flex: 1 1;
   padding: 9px;
   width: max-content;
@@ -404,4 +404,14 @@ body {
   border-radius: 5px;
   z-index: 0;
   opacity: 0;
+}
+.timelineModal-content {
+  background-color: white;
+  /* margin: auto; */
+  padding: 20px;
+  border: 1px solid #888;
+  width: calc(100vw - 110px);
+  margin-top: 50px;
+  border-radius: 6px;
+  margin-left: auto;
 }

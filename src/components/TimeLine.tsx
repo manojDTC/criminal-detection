@@ -14,11 +14,65 @@ interface Timeline {
   dateTime: Date;
 }
 
+interface Person {
+  id: string;
+  name: string;
+  personType: string;
+}
+
+interface ImageDetails {
+  id: string;
+  imageUrl: string;
+  personId: string;
+}
+
+interface Employee {
+  id: number;
+  name: string;
+  gender: string;
+  personType: string;
+  role: string;
+  code: string;
+  email: string;
+  contactNo: string;
+  language: string;
+  country: string;
+  cameraName: string;
+  images: ImageDetails[];
+}
+
+interface Criminal {
+  id: string;
+  name: string;
+  gender: string;
+  personType: string;
+  code: string;
+  email: string;
+  contactNo: string;
+  language: string;
+  country: string;
+  issuedBy: string;
+  poc: string;
+  originCity: string;
+  crime: string;
+  images: ImageDetails[];
+}
+
 const TimeLine = () => {
   const [timeline, setTimeline] = useState<Timeline[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
-  const [fromDate, setFromDate] = useState<Date | undefined>(undefined);
-  const [toDate, setToDate] = useState<Date | undefined>(undefined);
+  const [fromDate, setFromDate] = useState<Date | undefined>(new Date());
+  const [toDate, setToDate] = useState<Date | undefined>(new Date());
+  const [persons, setPersons] = useState<Person[]>([]);
+  const [selectedPerson, setSelectedPerson] = useState("");
+  const [employeeDetails, setEmployeeDetails] = useState<Employee | null>(null);
+  const [criminalDetails, setCriminalDetails] = useState<Criminal | null>(null);
+  const [selectedPersonDetails, setSelectedPersonDetails] =
+    useState<Person | null>({
+      id: "",
+      name: "",
+      personType: "",
+    });
 
   // Handle start date selection
   const handleFromDateChange = (date: Date | null) => {
@@ -46,12 +100,23 @@ const TimeLine = () => {
   const fetchTimeline = async () => {
     try {
       setLoading(true);
+      let Fdate, Tdate;
+      if (fromDate) {
+        const tmpdate1 = new Date(fromDate);
+        Fdate = tmpdate1.toISOString();
+      }
+
+      if (toDate) {
+        const tmpdate2 = new Date(toDate);
+        Tdate = tmpdate2.toISOString();
+      }
+
       const data = {
-        cameraId: "3fa85f64-5717-4562-b3fc-2c963f66afa6",
-        fromDate: "2024-10-23T09:40:54.809Z",
-        todate: "2024-10-23T09:40:54.809Z",
-        type: "string",
+        fromDate: Fdate,
+        todate: Tdate,
+        personId: selectedPerson,
       };
+
       const response = await axios.post<Timeline[]>(
         `${process.env.REACT_APP_BASE_URL}/api/Person/GetTimeline`,
         data
@@ -65,8 +130,48 @@ const TimeLine = () => {
   };
 
   useEffect(() => {
+    const fetchPersons = async () => {
+      try {
+        setLoading(true);
+
+        const response = await axios.get<Person[]>(
+          `${process.env.REACT_APP_BASE_URL}/api/Person/GetTimelineDetails`
+        );
+        setPersons(response.data);
+      } catch (error) {
+        toast.error("Failed to load persons");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchPersons();
     fetchTimeline();
   }, []);
+
+  const getSelectedPerson = async (
+    event: React.ChangeEvent<HTMLSelectElement>
+  ) => {
+    const personId = event.target.value;
+    setSelectedPerson(personId);
+    const personDetails = persons.find((person) => person.id === personId);
+    setSelectedPersonDetails(personDetails!);
+
+    setEmployeeDetails(null);
+    setCriminalDetails(null);
+
+    if (personDetails?.personType === "Employee") {
+      const response = await axios.get<Employee>(
+        `${process.env.REACT_APP_BASE_URL}/api/Person/GetEmployeeById?Id=${personId}`
+      );
+      setEmployeeDetails(response.data);
+    } else {
+      const response = await axios.get<Criminal>(
+        `${process.env.REACT_APP_BASE_URL}/api/Person/GetCriminalById?Id=${personId}`
+      );
+      setCriminalDetails(response.data);
+    }
+  };
 
   return (
     <div
@@ -144,15 +249,17 @@ const TimeLine = () => {
                 border: "0",
                 marginTop: "10px",
               }}
+              onChange={getSelectedPerson}
+              value={selectedPerson}
             >
               <option value="" selected disabled>
                 --Select Name--
               </option>
-              <option value="name1">Name1</option>
-              <option value="name2">Name2</option>
-              <option value="name3">Name3</option>
-              <option value="name4">Name4</option>
-              <option value="name5">Name5</option>
+              {persons.map((person) => (
+                <option key={person.id} value={person.id}>
+                  {person.name}
+                </option>
+              ))}
             </select>
           </div>
         </div>
@@ -166,76 +273,115 @@ const TimeLine = () => {
           }}
         >
           <div style={{ display: "flex", alignItems: "center", gap: "5px" }}>
-            <img
-              src={image}
-              alt="profile"
-              style={{
-                borderRadius: "50%",
-                height: "66px",
-                width: "66px",
-                objectFit: "contain",
-              }}
-            ></img>
+            {selectedPersonDetails!.personType &&
+              (employeeDetails?.images[0] || criminalDetails?.images[0]) && (
+                <img
+                  src={
+                    selectedPersonDetails!.personType === "Employee"
+                      ? `${process.env.REACT_APP_BASE_URL}/${
+                          employeeDetails?.images[0]!.imageUrl
+                        }`
+                      : `${process.env.REACT_APP_BASE_URL}/${
+                          criminalDetails?.images[0]!.imageUrl
+                        }`
+                  }
+                  alt="profile"
+                  style={{
+                    borderRadius: "50%",
+                    height: "66px",
+                    width: "66px",
+                    objectFit: "contain",
+                  }}
+                ></img>
+              )}
             <div>
-              <p style={{ margin: "0", fontSize: "14px" }}>William Jhonson</p>
-              <span style={{ fontSize: "8px" }}>Criminal</span>
+              <p style={{ margin: "0", fontSize: "14px" }}>
+                {selectedPersonDetails!.personType === "Employee"
+                  ? employeeDetails?.name
+                  : criminalDetails?.name}
+              </p>
+              {selectedPersonDetails!.personType === "Criminal" && (
+                <span style={{ fontSize: "8px" }}>Criminal</span>
+              )}
             </div>
           </div>
-          <div style={{ display: "flex", alignItems: "center", gap: "5px" }}>
-            <img
-              src={star}
-              alt="star"
-              style={{
-                height: "30px",
-                width: "30px",
-                objectFit: "contain",
-              }}
-            ></img>
-            <div>
-              <p style={{ margin: "0", fontSize: "14px" }}>CBI</p>
-              <span style={{ fontSize: "8px" }}>Issued By</span>
-            </div>
-          </div>
-          <div style={{ display: "flex", alignItems: "center", gap: "5px" }}>
-            <img
-              src={tick}
-              alt="tick"
-              style={{
-                height: "30px",
-                width: "30px",
-                objectFit: "contain",
-              }}
-            ></img>
-            <div>
-              <p style={{ margin: "0", fontSize: "14px" }}>CP Bengaluru</p>
-              <span style={{ fontSize: "8px" }}>POC</span>
-            </div>
-          </div>
-          <div>
-            <p style={{ fontSize: "12px" }}>
-              <b>Suspected ID</b>: 101
-            </p>
-          </div>
-          <div>
-            <p style={{ fontSize: "12px" }}>
-              <b>Origin City</b>: London
-            </p>
-          </div>
-          <div>
-            <p style={{ fontSize: "12px" }}>
-              <b>Crime</b>: Robbery
-            </p>
-          </div>
-          <div>
-            <p style={{ fontSize: "12px" }}>
-              <b>Langauage</b>: English
-            </p>
-          </div>
-          <div>
-            <p style={{ fontSize: "12px" }}>
-              <b>Country</b>: England
-            </p>
-          </div>
+          {selectedPersonDetails!.personType === "Criminal" && (
+            <>
+              <div
+                style={{ display: "flex", alignItems: "center", gap: "5px" }}
+              >
+                <img
+                  src={star}
+                  alt="star"
+                  style={{
+                    height: "30px",
+                    width: "30px",
+                    objectFit: "contain",
+                  }}
+                ></img>
+                <div>
+                  <p style={{ margin: "0", fontSize: "14px" }}>
+                    {criminalDetails?.issuedBy}
+                  </p>
+                  <span style={{ fontSize: "8px" }}>Issued By</span>
+                </div>
+              </div>
+              <div
+                style={{ display: "flex", alignItems: "center", gap: "5px" }}
+              >
+                <img
+                  src={tick}
+                  alt="tick"
+                  style={{
+                    height: "30px",
+                    width: "30px",
+                    objectFit: "contain",
+                  }}
+                ></img>
+                <div>
+                  <p style={{ margin: "0", fontSize: "14px" }}>
+                    {criminalDetails?.poc}
+                  </p>
+                  <span style={{ fontSize: "8px" }}>POC</span>
+                </div>
+              </div>
+              <div>
+                <p style={{ fontSize: "12px" }}>
+                  <b>Suspected ID</b>: {criminalDetails?.code}
+                </p>
+              </div>
+              <div>
+                <p style={{ fontSize: "12px" }}>
+                  <b>Origin City</b>: {criminalDetails?.originCity}
+                </p>
+              </div>
+              <div>
+                <p style={{ fontSize: "12px" }}>
+                  <b>Crime</b>: {criminalDetails?.crime}
+                </p>
+              </div>
+            </>
+          )}
+          {selectedPersonDetails?.personType && (
+            <>
+              <div>
+                <p style={{ fontSize: "12px" }}>
+                  <b>Langauage</b>:{" "}
+                  {selectedPersonDetails!.personType === "Employee"
+                    ? employeeDetails?.language
+                    : criminalDetails?.language}
+                </p>
+              </div>
+              <div>
+                <p style={{ fontSize: "12px" }}>
+                  <b>Country</b>:{" "}
+                  {selectedPersonDetails!.personType === "Employee"
+                    ? employeeDetails?.country
+                    : criminalDetails?.country}
+                </p>
+              </div>
+            </>
+          )}
         </div>
       </div>
       <div
