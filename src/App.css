@@ -285,7 +285,9 @@ body {
   overflow-wrap: anywhere;
 }
 .criminaltable th,
-.criminaltable td {
+.criminaltable td,
+.livetable th,
+.livetable td {
   padding: 0px;
   font-size: 14px;
 }
@@ -296,7 +298,8 @@ body {
 .dbtable tr {
   height: 60px;
 }
-.criminaltable tr {
+.criminaltable tr,
+.livetable tr {
   height: 40px;
 }
 .sidemenu ul .active a {
@@ -317,7 +320,7 @@ body {
 }
 
 /* Modal Content */
-.modal-content.employeeModal-content {
+.formmodal-content {
   background-color: white;
   margin: auto;
   padding: 20px;
@@ -326,17 +329,20 @@ body {
   margin-top: 60px;
   border-radius: 6px;
 }
-.modal-content.employeeModal-content div {
+.formmodal-content div {
   padding: 13px 0;
   display: flex;
   align-items: center;
 }
-.modal-content.employeeModal-content div label {
+.timelineModal-content div {
+  display: block;
+}
+.formmodal-content div label {
   width: 110px;
   display: inline-block;
 }
-.modal-content.employeeModal-content div input,
-.modal-content.employeeModal-content div select {
+.formmodal-content div input,
+.formmodal-content div select {
   flex: 1 1;
   padding: 9px;
   width: max-content;
@@ -405,13 +411,19 @@ body {
   z-index: 0;
   opacity: 0;
 }
+
+.criminaltable tr:hover,
+.livetable tr:hover {
+  cursor: pointer;
+  box-shadow: 0 0 20px #ccccccad;
+}
+
 .timelineModal-content {
-  background-color: white;
-  /* margin: auto; */
-  padding: 20px;
+  background-color: #fff;
   border: 1px solid #888;
-  width: calc(100vw - 110px);
-  margin-top: 50px;
   border-radius: 6px;
   margin-left: auto;
+  margin-top: 50px;
+  padding: 20px;
+  width: calc(100vw - 110px);
 }

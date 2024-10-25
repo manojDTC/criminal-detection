@@ -1,13 +1,27 @@
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import Live from "../assets/chat.png";
 import Database from "../assets/people_alt.png";
 import History from "../assets/history.png";
 import TimeLine from "../assets/timeline.png";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 const Sidebar = () => {
-  const [activeTab, setActiveTab] = useState<string>("d");
+  const location = useLocation();
+  const currentPath = location.pathname;
 
+  const [activeTab, setActiveTab] = useState<string>("");
+
+  useEffect(() => {
+    if (currentPath === "/dashboard") {
+      setActiveTab("d");
+    } else if (currentPath === "/livefeed") {
+      setActiveTab("l");
+    } else if (currentPath === "/history") {
+      setActiveTab("h");
+    } else if (currentPath === "/timeline") {
+      setActiveTab("t");
+    }
+  }, []);
   return (
     <div style={{ background: "#EFF3F5" }} className="sidemenu">
       <ul>

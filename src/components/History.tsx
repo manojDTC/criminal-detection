@@ -30,8 +30,8 @@ const History = () => {
   const [loading, setLoading] = useState<boolean>(true);
   // const [fromDate, setFromDate] = useState<Date | null>(new Date());
   // const [toDate, setToDate] = useState<Date | null>(new Date());
-  const [fromDate, setFromDate] = useState<Date | undefined>(new Date());
-  const [toDate, setToDate] = useState<Date | undefined>(new Date());
+  const [fromDate, setFromDate] = useState<Date>(new Date());
+  const [toDate, setToDate] = useState<Date>(new Date());
   const [cameraList, setCameraList] = useState<Camera[]>([]);
   const [selectedCamera, setSelectedCamera] = useState("");
   const [personType, setPersonType] = useState<string[]>([]);
@@ -44,8 +44,9 @@ const History = () => {
       alert("Start date cannot be later than the end date");
       return;
     } else {
-      setFromDate(date || undefined);
-      fetchHistory();
+      setFromDate(date!);
+      const fDate = date;
+      fetchHistory(selectedCamera, fDate, toDate, selectedPersonType);
     }
   };
 
@@ -55,33 +56,37 @@ const History = () => {
       toast.error("End date cannot be earlier than the start date");
       alert("End date cannot be earlier than the start date");
     } else {
-      setToDate(date || undefined);
-      fetchHistory();
+      setToDate(date!);
+      const tDate = date;
+      fetchHistory(selectedCamera, fromDate, tDate, selectedPersonType);
     }
   };
 
-  const fetchHistory = async () => {
+  const fetchHistory = async (
+    camera: string,
+    fromDate1: Date | null,
+    toDate1: Date | null,
+    type: string
+  ) => {
     try {
       setLoading(true);
       let Fdate, Tdate;
       if (fromDate) {
-        const tmpdate1 = new Date(fromDate);
+        const tmpdate1 = new Date(fromDate1!);
         Fdate = tmpdate1.toISOString();
       }
 
       if (toDate) {
-        const tmpdate2 = new Date(toDate);
+        const tmpdate2 = new Date(toDate1!);
         Tdate = tmpdate2.toISOString();
       }
 
       const data = {
-        cameraId: selectedCamera,
+        cameraId: camera,
         fromDate: Fdate,
         todate: Tdate,
         type: selectedPersonType,
       };
-
-      console.log(data);
 
       const response = await axios.post<History[]>(
         `${process.env.REACT_APP_BASE_URL}/api/Person/GetHistory`,
@@ -96,7 +101,7 @@ const History = () => {
   };
 
   useEffect(() => {
-    fetchHistory();
+    fetchHistory(selectedCamera, fromDate, toDate, selectedPersonType);
 
     const fetchCameraList = async () => {
       setLoading(true);
@@ -138,14 +143,14 @@ const History = () => {
   ) => {
     const cameraId = event.target.value;
     setSelectedCamera(cameraId);
-    fetchHistory();
+    fetchHistory(cameraId, fromDate, toDate, selectedPersonType);
   };
 
   const getSelectedPersonType = (
     event: React.ChangeEvent<HTMLSelectElement>
   ) => {
     setSelectedPersonType(event.target.value);
-    fetchHistory();
+    fetchHistory(selectedCamera, fromDate, toDate, event.target.value);
   };
 
   return (

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import image from "../assets/image 19.png";
 import image1 from "../assets/image 20.png";
 import cap from "../assets/cap.png";
@@ -22,9 +22,48 @@ interface LiveDetection {
   gender: string;
   details: string;
   faceCover: string;
+  personId: string;
+  fromDate: Date;
+  toDate: string;
 }
 
-// interface
+interface ImageDetails {
+  id: string;
+  imageUrl: string;
+  personId: string;
+}
+
+interface Employee {
+  id: number;
+  name: string;
+  gender: string;
+  personType: string;
+  role: string;
+  code: string;
+  email: string;
+  contactNo: string;
+  language: string;
+  country: string;
+  cameraName: string;
+  images: ImageDetails[];
+}
+
+interface Criminal {
+  id: string;
+  name: string;
+  gender: string;
+  personType: string;
+  code: string;
+  email: string;
+  contactNo: string;
+  language: string;
+  country: string;
+  issuedBy: string;
+  poc: string;
+  originCity: string;
+  crime: string;
+  images: ImageDetails[];
+}
 
 const Live = () => {
   const [cameraLists, setCameraLists] = useState<Camera[]>([]);
@@ -37,11 +76,23 @@ const Live = () => {
   const [liveDetectionList, setLiveDetectionList] = useState<
     LiveDetection[] | null
   >(null);
-  const [selectedType, setSelectedType] = useState<string>("Criminal");
+  const [selectedType, setSelectedType] = useState<string>("");
   const [criminalDetectionList, setCriminalDetectionList] = useState<
     LiveDetection[] | null
   >(null);
   const [isOpen, setIsOpen] = useState<boolean>(false);
+
+  const [fromDate, setFromDate] = useState<Date | undefined>(new Date());
+  const [toDate, setToDate] = useState<Date | undefined>(new Date());
+  const [selectedPerson, setSelectedPerson] = useState("");
+  const [employeeDetails, setEmployeeDetails] = useState<Employee | null>(null);
+  const [criminalDetails, setCriminalDetails] = useState<Criminal | null>(null);
+
+  const selectedTypeRef = useRef(selectedType);
+
+  useEffect(() => {
+    selectedTypeRef.current = selectedType;
+  }, [selectedType]);
 
   useEffect(() => {
     const fetchCameraList = async () => {
@@ -70,6 +121,7 @@ const Live = () => {
     const camera = cameraLists.find((camera) => camera.id === cameraId);
     setSelectedCameraDetails(camera);
     setSelectedCamera(cameraId);
+    setSelectedType("Criminal");
     setLiveDetectionList([]);
     setCriminalDetectionList([]);
 
@@ -92,7 +144,7 @@ const Live = () => {
 
   const getSelectedType = (event: React.ChangeEvent<HTMLSelectElement>) => {
     setSelectedType(event.target.value);
-    fetchCriminalDetections(event.target.value);
+    fetchCriminalDetections();
   };
 
   const fetchLiveDetections = async () => {
@@ -107,10 +159,11 @@ const Live = () => {
     }
   };
 
-  const fetchCriminalDetections = async (type: string = "Criminal") => {
+  const fetchCriminalDetections = async () => {
+    const type1 = selectedTypeRef.current;
     try {
       const response = await axios.get<LiveDetection[]>(
-        `${process.env.REACT_APP_BASE_URL}/api/Person/GetDetection?Type=${type}`
+        `${process.env.REACT_APP_BASE_URL}/api/Person/GetDetection?Type=${type1}`
       );
 
       setCriminalDetectionList(response.data);
@@ -155,7 +208,6 @@ const Live = () => {
           >
             <label htmlFor="camera">Select Camera</label>
             <br></br>
-
             <select
               name="camera"
               id="camera"
@@ -309,6 +361,9 @@ const Live = () => {
                       <th>Gender</th>
                       <th>Details</th>
                       <th>Face Coverage</th>
+                      <th style={{ display: "none" }}>Person Id</th>
+                      <th style={{ display: "none" }}>From Date</th>
+                      <th style={{ display: "none" }}>To Date</th>
                     </tr>
                     {criminalDetectionList?.map((criminalDetection) => {
                       const cover =
@@ -317,8 +372,19 @@ const Live = () => {
                           : criminalDetection.faceCover === "Cap"
                           ? cap
                           : null1;
+
+                      const formattedFromDate = new Date(
+                        criminalDetection.fromDate
+                      ).toLocaleString();
+                      const formattedToDate = new Date(
+                        criminalDetection.toDate
+                      ).toLocaleString();
+
                       return (
-                        <tr key={criminalDetection.imageUrl}>
+                        <tr
+                          key={criminalDetection.imageUrl}
+                          onClick={openModal}
+                        >
                           <td>
                             <img
                               src={
@@ -353,6 +419,13 @@ const Live = () => {
                               ? "Cap Detected"
                               : "null"}
                           </td>
+                          <td style={{ display: "none" }}>
+                            {criminalDetection.personId}
+                          </td>
+                          <td style={{ display: "none" }}>
+                            {formattedFromDate}
+                          </td>
+                          <td style={{ display: "none" }}>{formattedToDate}</td>
                         </tr>
                       );
                     })}
@@ -382,6 +455,9 @@ const Live = () => {
                       <th>Gender</th>
                       <th>Details</th>
                       <th>Face Coverage</th>
+                      <th style={{ display: "none" }}>Person Id</th>
+                      <th style={{ display: "none" }}>From Date</th>
+                      <th style={{ display: "none" }}>To Date</th>
                     </tr>
                     {liveDetectionList?.map((livedetection, index) => {
                       const cover =
@@ -390,6 +466,14 @@ const Live = () => {
                           : livedetection.faceCover === "Cap"
                           ? cap
                           : null1;
+
+                      const formattedFromDate = new Date(
+                        livedetection.fromDate
+                      ).toLocaleString();
+                      const formattedToDate = new Date(
+                        livedetection.toDate
+                      ).toLocaleString();
+
                       return (
                         <tr key={index} onClick={openModal}>
                           <td>
@@ -426,6 +510,13 @@ const Live = () => {
                               ? "Cap Detected"
                               : "null"}
                           </td>
+                          <td style={{ display: "none" }}>
+                            {livedetection.personId}
+                          </td>
+                          <td style={{ display: "none" }}>
+                            {formattedFromDate}
+                          </td>
+                          <td style={{ display: "none" }}>{formattedToDate}</td>
                         </tr>
                       );
                     })}
@@ -438,7 +529,10 @@ const Live = () => {
       </div>
       {isOpen && (
         <div className="modal timelineModal">
-          <div className="modal-content timelineModal-content">
+          <div
+            className="modal-content timelineModal-content"
+            style={{ display: "block" }}
+          >
             <span className="close" onClick={closeModal}>
               &times;
             </span>
@@ -454,7 +548,6 @@ const Live = () => {
                 <div>
                   <label htmlFor="camera">Date From</label>
                   <br></br>
-
                   <select
                     name="camera"
                     id="camera"
@@ -462,7 +555,6 @@ const Live = () => {
                       width: "300px",
                       padding: "10px",
                       background: "#EEF0F3",
-
                       borderRadius: "4px",
                       border: "0",
                       marginTop: "10px",

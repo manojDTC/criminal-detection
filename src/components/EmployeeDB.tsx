@@ -136,14 +136,19 @@ const EmployeeDB = () => {
                         <td
                           style={{
                             display: "flex",
-                            justifyContent: "center",
+                            justifyContent: "left",
                             gap: "10px",
                             alignItems: "center",
                           }}
                         >
                           <span>
                             <img
-                              style={{ height: "40px", borderRadius: "50%" }}
+                              style={{
+                                height: "40px",
+                                borderRadius: "50%",
+                                width: "40px",
+                                objectFit: "contain",
+                              }}
                               src={`${process.env.REACT_APP_BASE_URL}/${firstImageUrl}`}
                               alt=""
                             ></img>

@@ -61,8 +61,8 @@ interface Criminal {
 const TimeLine = () => {
   const [timeline, setTimeline] = useState<Timeline[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
-  const [fromDate, setFromDate] = useState<Date | undefined>(new Date());
-  const [toDate, setToDate] = useState<Date | undefined>(new Date());
+  const [fromDate, setFromDate] = useState<Date>(new Date());
+  const [toDate, setToDate] = useState<Date>(new Date());
   const [persons, setPersons] = useState<Person[]>([]);
   const [selectedPerson, setSelectedPerson] = useState("");
   const [employeeDetails, setEmployeeDetails] = useState<Employee | null>(null);
@@ -81,8 +81,9 @@ const TimeLine = () => {
       alert("Start date cannot be later than the end date");
       return;
     } else {
-      setFromDate(date || undefined);
-      fetchTimeline();
+      setFromDate(date!);
+      const fDate = date;
+      fetchTimeline(fDate, toDate, selectedPerson);
     }
   };
 
@@ -92,29 +93,34 @@ const TimeLine = () => {
       toast.error("End date cannot be earlier than the start date");
       alert("End date cannot be earlier than the start date");
     } else {
-      setToDate(date || undefined);
-      fetchTimeline();
+      setToDate(date!);
+      const tDate = date;
+      fetchTimeline(fromDate, tDate, selectedPerson);
     }
   };
 
-  const fetchTimeline = async () => {
+  const fetchTimeline = async (
+    fromDateParams: Date | null,
+    toDateParams: Date | null,
+    person: string
+  ) => {
     try {
       setLoading(true);
       let Fdate, Tdate;
       if (fromDate) {
-        const tmpdate1 = new Date(fromDate);
+        const tmpdate1 = new Date(fromDateParams!);
         Fdate = tmpdate1.toISOString();
       }
 
       if (toDate) {
-        const tmpdate2 = new Date(toDate);
+        const tmpdate2 = new Date(toDateParams!);
         Tdate = tmpdate2.toISOString();
       }
 
       const data = {
         fromDate: Fdate,
         todate: Tdate,
-        personId: selectedPerson,
+        personId: person,
       };
 
       const response = await axios.post<Timeline[]>(
@@ -146,7 +152,7 @@ const TimeLine = () => {
     };
 
     fetchPersons();
-    fetchTimeline();
+    fetchTimeline(fromDate, toDate, selectedPerson);
   }, []);
 
   const getSelectedPerson = async (
@@ -277,7 +283,8 @@ const TimeLine = () => {
               (employeeDetails?.images[0] || criminalDetails?.images[0]) && (
                 <img
                   src={
-                    selectedPersonDetails!.personType === "Employee"
+                    selectedPersonDetails!.personType.toLocaleLowerCase() ===
+                    "employee"
                       ? `${process.env.REACT_APP_BASE_URL}/${
                           employeeDetails?.images[0]!.imageUrl
                         }`
@@ -296,16 +303,17 @@ const TimeLine = () => {
               )}
             <div>
               <p style={{ margin: "0", fontSize: "14px" }}>
-                {selectedPersonDetails!.personType === "Employee"
+                {selectedPersonDetails!.personType.toLocaleLowerCase() ===
+                "employee"
                   ? employeeDetails?.name
                   : criminalDetails?.name}
               </p>
-              {selectedPersonDetails!.personType === "Criminal" && (
-                <span style={{ fontSize: "8px" }}>Criminal</span>
-              )}
+              {selectedPersonDetails!.personType.toLocaleLowerCase() ===
+                "criminal" && <span style={{ fontSize: "8px" }}>Criminal</span>}
             </div>
           </div>
-          {selectedPersonDetails!.personType === "Criminal" && (
+          {selectedPersonDetails!.personType.toLocaleLowerCase() ===
+            "criminal" && (
             <>
               <div
                 style={{ display: "flex", alignItems: "center", gap: "5px" }}
@@ -367,7 +375,8 @@ const TimeLine = () => {
               <div>
                 <p style={{ fontSize: "12px" }}>
                   <b>Langauage</b>:{" "}
-                  {selectedPersonDetails!.personType === "Employee"
+                  {selectedPersonDetails!.personType.toLocaleLowerCase() ===
+                  "employee"
                     ? employeeDetails?.language
                     : criminalDetails?.language}
                 </p>
@@ -375,7 +384,8 @@ const TimeLine = () => {
               <div>
                 <p style={{ fontSize: "12px" }}>
                   <b>Country</b>:{" "}
-                  {selectedPersonDetails!.personType === "Employee"
+                  {selectedPersonDetails!.personType.toLocaleLowerCase() ===
+                  "employee"
                     ? employeeDetails?.country
                     : criminalDetails?.country}
                 </p>
