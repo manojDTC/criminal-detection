@@ -330,7 +330,7 @@ body {
   border-radius: 6px;
 }
 .formmodal-content div {
-  padding: 13px 0;
+  padding: 8px 0;
   display: flex;
   align-items: center;
 }
@@ -376,14 +376,17 @@ body {
   font-size: 12px;
   padding: 6px;
 }
+
 .alertTable td button {
   background: #e82127bd;
+  border: 1px solid #e82127bd;
   color: white;
-  border: 0;
+
   outline: none;
   padding: 8px;
   font-size: 12px;
   border-radius: 4px;
+  cursor: pointer;
 }
 
 *::-webkit-scrollbar {
@@ -426,4 +429,9 @@ body {
   margin-top: 50px;
   padding: 20px;
   width: calc(100vw - 110px);
+}
+
+.alertTable td button:hover {
+  background: white;
+  color: #e82127bd;
 }

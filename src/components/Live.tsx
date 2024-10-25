@@ -65,6 +65,13 @@ interface Criminal {
   images: ImageDetails[];
 }
 
+interface Timeline {
+  imageUrl: string;
+  camera: string;
+  location: string;
+  dateTime: Date;
+}
+
 const Live = () => {
   const [cameraLists, setCameraLists] = useState<Camera[]>([]);
   const [selectedCamera, setSelectedCamera] = useState("");
@@ -84,9 +91,11 @@ const Live = () => {
 
   const [fromDate, setFromDate] = useState<Date | undefined>(new Date());
   const [toDate, setToDate] = useState<Date | undefined>(new Date());
+  const [timeline, setTimeline] = useState<Timeline[]>([]);
   const [selectedPerson, setSelectedPerson] = useState("");
   const [employeeDetails, setEmployeeDetails] = useState<Employee | null>(null);
   const [criminalDetails, setCriminalDetails] = useState<Criminal | null>(null);
+  const [selectedPersonDetails, setSelectedPersonDetails] = useState("");
 
   const selectedTypeRef = useRef(selectedType);
 
@@ -172,7 +181,54 @@ const Live = () => {
     }
   };
 
-  const openModal = () => {
+  const openModal = async (
+    id: string,
+    fromDateParams: Date,
+    toDateParams: string,
+    detail: string
+  ) => {
+    try {
+      setLoading(true);
+      setSelectedPersonDetails(detail);
+      let Fdate, Tdate;
+      if (fromDateParams) {
+        const tmpdate1 = new Date(fromDateParams!);
+        Fdate = tmpdate1.toISOString();
+      }
+
+      if (toDateParams) {
+        const tmpdate2 = new Date(toDateParams!);
+        Tdate = tmpdate2.toISOString();
+      }
+
+      const data = {
+        fromDate: Fdate,
+        todate: Tdate,
+        personId: id,
+      };
+
+      if (detail.toLocaleLowerCase() === "employee") {
+        const response = await axios.get<Employee>(
+          `${process.env.REACT_APP_BASE_URL}/api/Person/GetEmployeeById?Id=${id}`
+        );
+        setEmployeeDetails(response.data);
+      } else {
+        const response = await axios.get<Criminal>(
+          `${process.env.REACT_APP_BASE_URL}/api/Person/GetCriminalById?Id=${id}`
+        );
+        setCriminalDetails(response.data);
+      }
+
+      const response = await axios.post<Timeline[]>(
+        `${process.env.REACT_APP_BASE_URL}/api/Person/GetTimeline`,
+        data
+      );
+      setTimeline(response.data);
+    } catch (error) {
+      toast.error("Failed to load history");
+    } finally {
+      setLoading(false);
+    }
     setIsOpen(true);
   };
 
@@ -383,7 +439,14 @@ const Live = () => {
                       return (
                         <tr
                           key={criminalDetection.imageUrl}
-                          onClick={openModal}
+                          onClick={() =>
+                            openModal(
+                              criminalDetection.personId,
+                              criminalDetection.fromDate,
+                              criminalDetection.toDate,
+                              criminalDetection.details
+                            )
+                          }
                         >
                           <td>
                             <img
@@ -475,7 +538,17 @@ const Live = () => {
                       ).toLocaleString();
 
                       return (
-                        <tr key={index} onClick={openModal}>
+                        <tr
+                          key={index}
+                          onClick={() =>
+                            openModal(
+                              livedetection.personId,
+                              livedetection.fromDate,
+                              livedetection.toDate,
+                              livedetection.details
+                            )
+                          }
+                        >
                           <td>
                             <img
                               src={
@@ -544,35 +617,56 @@ const Live = () => {
                 marginBottom: "15px",
               }}
             >
-              <div style={{ display: "flex", gap: "20px", marginTop: "10px" }}>
+              {/* <div style={{ display: "flex", gap: "20px", marginTop: "10px" }}>
                 <div>
                   <label htmlFor="camera">Date From</label>
                   <br></br>
-                  <select
-                    name="camera"
-                    id="camera"
-                    style={{
-                      width: "300px",
-                      padding: "10px",
-                      background: "#EEF0F3",
-                      borderRadius: "4px",
-                      border: "0",
-                      marginTop: "10px",
-                    }}
-                  >
-                    <option value="volvo">Volvo</option>
-                    <option value="saab">Saab</option>
-                    <option value="mercedes">Mercedes</option>
-                    <option value="audi">Audi</option>
-                  </select>
+                  <DatePicker
+                    customInput={
+                      <input
+                        style={{
+                          width: "300px",
+                          padding: "10px",
+                          background: "#EEF0F3",
+                          borderRadius: "4px",
+                          border: "0",
+                          marginTop: "10px",
+                        }}
+                      />
+                    }
+                    selected={fromDate}
+                    onChange={handleFromDateChange} // Use custom handler
+                    maxDate={toDate} // Restrict future dates beyond the end date
+                  />
                 </div>
                 <div>
-                  <label htmlFor="camera">Date From</label>
+                  <label htmlFor="camera">Date To</label>
                   <br></br>
 
+                  <DatePicker
+                    customInput={
+                      <input
+                        style={{
+                          width: "300px",
+                          padding: "10px",
+                          background: "#EEF0F3",
+                          borderRadius: "4px",
+                          border: "0",
+                          marginTop: "10px",
+                        }}
+                      />
+                    }
+                    selected={toDate}
+                    onChange={handleToDateChange} // Use custom handler
+                    minDate={fromDate} // Restrict dates before the start date
+                  />
+                </div>
+                <div>
+                  <label htmlFor="name">Name:</label>
+                  <br></br>
                   <select
-                    name="camera"
-                    id="camera"
+                    id="name"
+                    name="name"
                     style={{
                       width: "300px",
                       padding: "10px",
@@ -581,14 +675,20 @@ const Live = () => {
                       border: "0",
                       marginTop: "10px",
                     }}
+                    onChange={getSelectedPerson}
+                    value={selectedPerson}
                   >
-                    <option value="volvo">Volvo</option>
-                    <option value="saab">Saab</option>
-                    <option value="mercedes">Mercedes</option>
-                    <option value="audi">Audi</option>
+                    <option value="" selected disabled>
+                      --Select Name--
+                    </option>
+                    {persons.map((person) => (
+                      <option key={person.id} value={person.id}>
+                        {person.name}
+                      </option>
+                    ))}
                   </select>
                 </div>
-              </div>
+              </div> */}
               <div
                 style={{
                   display: "flex",
@@ -601,84 +701,128 @@ const Live = () => {
                 <div
                   style={{ display: "flex", alignItems: "center", gap: "5px" }}
                 >
-                  <img
-                    src={image}
-                    alt="profile"
-                    style={{
-                      borderRadius: "50%",
-                      height: "66px",
-                      width: "66px",
-                      objectFit: "contain",
-                    }}
-                  ></img>
+                  {selectedPersonDetails! &&
+                    (employeeDetails?.images[0] ||
+                      criminalDetails?.images[0]) && (
+                      <img
+                        src={
+                          selectedPersonDetails!.toLocaleLowerCase() ===
+                          "employee"
+                            ? `${process.env.REACT_APP_BASE_URL}/${
+                                employeeDetails?.images[0]!.imageUrl
+                              }`
+                            : `${process.env.REACT_APP_BASE_URL}/${
+                                criminalDetails?.images[0]!.imageUrl
+                              }`
+                        }
+                        alt="profile"
+                        style={{
+                          borderRadius: "50%",
+                          height: "66px",
+                          width: "66px",
+                          objectFit: "contain",
+                        }}
+                      ></img>
+                    )}
                   <div>
                     <p style={{ margin: "0", fontSize: "14px" }}>
-                      William Jhonson
+                      {selectedPersonDetails!.toLocaleLowerCase() === "employee"
+                        ? employeeDetails?.name
+                        : criminalDetails?.name}
                     </p>
-                    <span style={{ fontSize: "8px" }}>Criminal</span>
+                    {selectedPersonDetails!.toLocaleLowerCase() ===
+                      "criminal" && (
+                      <span style={{ fontSize: "8px" }}>Criminal</span>
+                    )}
                   </div>
                 </div>
-                <div
-                  style={{ display: "flex", alignItems: "center", gap: "5px" }}
-                >
-                  <img
-                    src={star}
-                    alt="star"
-                    style={{
-                      height: "30px",
-                      width: "30px",
-                      objectFit: "contain",
-                    }}
-                  ></img>
-                  <div>
-                    <p style={{ margin: "0", fontSize: "14px" }}>CBI</p>
-                    <span style={{ fontSize: "8px" }}>Issued By</span>
-                  </div>
-                </div>
-                <div
-                  style={{ display: "flex", alignItems: "center", gap: "5px" }}
-                >
-                  <img
-                    src={tick}
-                    alt="tick"
-                    style={{
-                      height: "30px",
-                      width: "30px",
-                      objectFit: "contain",
-                    }}
-                  ></img>
-                  <div>
-                    <p style={{ margin: "0", fontSize: "14px" }}>
-                      CP Bengaluru
-                    </p>
-                    <span style={{ fontSize: "8px" }}>POC</span>
-                  </div>
-                </div>
-                <div>
-                  <p style={{ fontSize: "12px" }}>
-                    <b>Suspected ID</b>: 101
-                  </p>
-                </div>
-                <div>
-                  <p style={{ fontSize: "12px" }}>
-                    <b>Origin City</b>: London
-                  </p>
-                </div>
-                <div>
-                  <p style={{ fontSize: "12px" }}>
-                    <b>Crime</b>: Robbery
-                  </p>
-                </div>
-                <div>
-                  <p style={{ fontSize: "12px" }}>
-                    <b>Langauage</b>: English
-                  </p>
-                </div>
-                <div>
-                  <p style={{ fontSize: "12px" }}>
-                    <b>Country</b>: England
-                  </p>
-                </div>
+                {selectedPersonDetails!.toLocaleLowerCase() === "criminal" && (
+                  <>
+                    <div
+                      style={{
+                        display: "flex",
+                        alignItems: "center",
+                        gap: "5px",
+                      }}
+                    >
+                      <img
+                        src={star}
+                        alt="star"
+                        style={{
+                          height: "30px",
+                          width: "30px",
+                          objectFit: "contain",
+                        }}
+                      ></img>
+                      <div>
+                        <p style={{ margin: "0", fontSize: "14px" }}>
+                          {criminalDetails?.issuedBy}
+                        </p>
+                        <span style={{ fontSize: "8px" }}>Issued By</span>
+                      </div>
+                    </div>
+                    <div
+                      style={{
+                        display: "flex",
+                        alignItems: "center",
+                        gap: "5px",
+                      }}
+                    >
+                      <img
+                        src={tick}
+                        alt="tick"
+                        style={{
+                          height: "30px",
+                          width: "30px",
+                          objectFit: "contain",
+                        }}
+                      ></img>
+                      <div>
+                        <p style={{ margin: "0", fontSize: "14px" }}>
+                          {criminalDetails?.poc}
+                        </p>
+                        <span style={{ fontSize: "8px" }}>POC</span>
+                      </div>
+                    </div>
+                    <div>
+                      <p style={{ fontSize: "12px" }}>
+                        <b>Suspected ID</b>: {criminalDetails?.code}
+                      </p>
+                    </div>
+                    <div>
+                      <p style={{ fontSize: "12px" }}>
+                        <b>Origin City</b>: {criminalDetails?.originCity}
+                      </p>
+                    </div>
+                    <div>
+                      <p style={{ fontSize: "12px" }}>
+                        <b>Crime</b>: {criminalDetails?.crime}
+                      </p>
+                    </div>
+                  </>
+                )}
+                {selectedPersonDetails && (
+                  <>
+                    <div>
+                      <p style={{ fontSize: "12px" }}>
+                        <b>Langauage</b>:{" "}
+                        {selectedPersonDetails!.toLocaleLowerCase() ===
+                        "employee"
+                          ? employeeDetails?.language
+                          : criminalDetails?.language}
+                      </p>
+                    </div>
+                    <div>
+                      <p style={{ fontSize: "12px" }}>
+                        <b>Country</b>:{" "}
+                        {selectedPersonDetails!.toLocaleLowerCase() ===
+                        "employee"
+                          ? employeeDetails?.country
+                          : criminalDetails?.country}
+                      </p>
+                    </div>
+                  </>
+                )}
               </div>
             </div>
             <div
@@ -699,249 +843,42 @@ const Live = () => {
                   justifyItems: "center",
                 }}
               >
-                <div>
-                  <img
-                    src={image}
-                    alt=""
-                    style={{
-                      height: "80px",
-                      width: "80px",
-                      borderRadius: "50%",
-                      border: "5px solid purple",
-                    }}
-                  ></img>
-                  <div>
-                    <p
-                      style={{
-                        color: "black",
-                        fontWeight: "600",
-                        fontSize: "14px",
-                        margin: "5px 0",
-                      }}
-                    >
-                      10:00AM 12/08/24
-                    </p>
-                    <span style={{ fontSize: "10px" }}>Camera 1</span>
-                    <br></br>
-                    <span style={{ fontSize: "10px" }}>Entrance</span>
-                  </div>
-                </div>
-                <div>
-                  <img
-                    src={image}
-                    alt=""
-                    style={{
-                      height: "80px",
-                      width: "80px",
-                      borderRadius: "50%",
-                      border: "5px solid purple",
-                    }}
-                  ></img>
-                  <div>
-                    <p
-                      style={{
-                        color: "black",
-                        fontWeight: "600",
-                        fontSize: "14px",
-                        margin: "5px 0",
-                      }}
-                    >
-                      10:00AM 12/08/24
-                    </p>
-                    <span style={{ fontSize: "10px" }}>Camera 1</span>
-                    <br></br>
-                    <span style={{ fontSize: "10px" }}>Entrance</span>
-                  </div>
-                </div>
-                <div>
-                  <img
-                    src={image}
-                    alt=""
-                    style={{
-                      height: "80px",
-                      width: "80px",
-                      borderRadius: "50%",
-                      border: "5px solid purple",
-                    }}
-                  ></img>
-                  <div>
-                    <p
-                      style={{
-                        color: "black",
-                        fontWeight: "600",
-                        fontSize: "14px",
-                        margin: "5px 0",
-                      }}
-                    >
-                      10:00AM 12/08/24
-                    </p>
-                    <span style={{ fontSize: "10px" }}>Camera 1</span>
-                    <br></br>
-                    <span style={{ fontSize: "10px" }}>Entrance</span>
-                  </div>
-                </div>
-                <div>
-                  <img
-                    src={image}
-                    alt=""
-                    style={{
-                      height: "80px",
-                      width: "80px",
-                      borderRadius: "50%",
-                      border: "5px solid purple",
-                    }}
-                  ></img>
-                  <div>
-                    <p
-                      style={{
-                        color: "black",
-                        fontWeight: "600",
-                        fontSize: "14px",
-                        margin: "5px 0",
-                      }}
-                    >
-                      10:00AM 12/08/24
-                    </p>
-                    <span style={{ fontSize: "10px" }}>Camera 1</span>
-                    <br></br>
-                    <span style={{ fontSize: "10px" }}>Entrance</span>
-                  </div>
-                </div>
-                <div>
-                  <img
-                    src={image}
-                    alt=""
-                    style={{
-                      height: "80px",
-                      width: "80px",
-                      borderRadius: "50%",
-                      border: "5px solid purple",
-                    }}
-                  ></img>
-                  <div>
-                    <p
-                      style={{
-                        color: "black",
-                        fontWeight: "600",
-                        fontSize: "14px",
-                        margin: "5px 0",
-                      }}
-                    >
-                      10:00AM 12/08/24
-                    </p>
-                    <span style={{ fontSize: "10px" }}>Camera 1</span>
-                    <br></br>
-                    <span style={{ fontSize: "10px" }}>Entrance</span>
-                  </div>
-                </div>
-                <div>
-                  <img
-                    src={image}
-                    alt=""
-                    style={{
-                      height: "80px",
-                      width: "80px",
-                      borderRadius: "50%",
-                      border: "5px solid purple",
-                    }}
-                  ></img>
-                  <div>
-                    <p
-                      style={{
-                        color: "black",
-                        fontWeight: "600",
-                        fontSize: "14px",
-                        margin: "5px 0",
-                      }}
-                    >
-                      10:00AM 12/08/24
-                    </p>
-                    <span style={{ fontSize: "10px" }}>Camera 1</span>
-                    <br></br>
-                    <span style={{ fontSize: "10px" }}>Entrance</span>
-                  </div>
-                </div>
-                <div>
-                  <img
-                    src={image}
-                    alt=""
-                    style={{
-                      height: "80px",
-                      width: "80px",
-                      borderRadius: "50%",
-                      border: "5px solid purple",
-                    }}
-                  ></img>
-                  <div>
-                    <p
-                      style={{
-                        color: "black",
-                        fontWeight: "600",
-                        fontSize: "14px",
-                        margin: "5px 0",
-                      }}
-                    >
-                      10:00AM 12/08/24
-                    </p>
-                    <span style={{ fontSize: "10px" }}>Camera 1</span>
-                    <br></br>
-                    <span style={{ fontSize: "10px" }}>Entrance</span>
-                  </div>
-                </div>
-                <div>
-                  <img
-                    src={image}
-                    alt=""
-                    style={{
-                      height: "80px",
-                      width: "80px",
-                      borderRadius: "50%",
-                      border: "5px solid purple",
-                    }}
-                  ></img>
-                  <div>
-                    <p
-                      style={{
-                        color: "black",
-                        fontWeight: "600",
-                        fontSize: "14px",
-                        margin: "5px 0",
-                      }}
-                    >
-                      10:00AM 12/08/24
-                    </p>
-                    <span style={{ fontSize: "10px" }}>Camera 1</span>
-                    <br></br>
-                    <span style={{ fontSize: "10px" }}>Entrance</span>
-                  </div>
-                </div>
-                <div>
-                  <img
-                    src={image}
-                    alt=""
-                    style={{
-                      height: "80px",
-                      width: "80px",
-                      borderRadius: "50%",
-                      border: "5px solid purple",
-                    }}
-                  ></img>
-                  <div>
-                    <p
-                      style={{
-                        color: "black",
-                        fontWeight: "600",
-                        fontSize: "14px",
-                        margin: "5px 0",
-                      }}
-                    >
-                      10:00AM 12/08/24
-                    </p>
-                    <span style={{ fontSize: "10px" }}>Camera 1</span>
-                    <br></br>
-                    <span style={{ fontSize: "10px" }}>Entrance</span>
-                  </div>
-                </div>
+                {timeline.map((time) => {
+                  const formattedDate = new Date(
+                    time.dateTime
+                  ).toLocaleString();
+                  return (
+                    <div>
+                      <img
+                        src={"data:image/jpeg;base64, " + time.imageUrl}
+                        alt=""
+                        style={{
+                          height: "80px",
+                          width: "80px",
+                          borderRadius: "50%",
+                          border: "5px solid purple",
+                        }}
+                      ></img>
+                      <div>
+                        <p
+                          style={{
+                            color: "black",
+                            fontWeight: "600",
+                            fontSize: "14px",
+                            margin: "5px 0",
+                          }}
+                        >
+                          {formattedDate}
+                        </p>
+                        <span style={{ fontSize: "10px" }}>{time.camera}</span>
+                        <br></br>
+                        <span style={{ fontSize: "10px" }}>
+                          {time.location}
+                        </span>
+                      </div>
+                    </div>
+                  );
+                })}
               </div>
             </div>
           </div>

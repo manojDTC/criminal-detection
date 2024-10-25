@@ -107,12 +107,12 @@ const TimeLine = () => {
     try {
       setLoading(true);
       let Fdate, Tdate;
-      if (fromDate) {
+      if (fromDateParams) {
         const tmpdate1 = new Date(fromDateParams!);
         Fdate = tmpdate1.toISOString();
       }
 
-      if (toDate) {
+      if (toDateParams) {
         const tmpdate2 = new Date(toDateParams!);
         Tdate = tmpdate2.toISOString();
       }
@@ -158,24 +158,28 @@ const TimeLine = () => {
   const getSelectedPerson = async (
     event: React.ChangeEvent<HTMLSelectElement>
   ) => {
-    const personId = event.target.value;
-    setSelectedPerson(personId);
-    const personDetails = persons.find((person) => person.id === personId);
-    setSelectedPersonDetails(personDetails!);
+    try {
+      const personId = event.target.value;
+      setSelectedPerson(personId);
+      const personDetails = persons.find((person) => person.id === personId);
+      setSelectedPersonDetails(personDetails!);
 
-    setEmployeeDetails(null);
-    setCriminalDetails(null);
+      setEmployeeDetails(null);
+      setCriminalDetails(null);
 
-    if (personDetails?.personType === "Employee") {
-      const response = await axios.get<Employee>(
-        `${process.env.REACT_APP_BASE_URL}/api/Person/GetEmployeeById?Id=${personId}`
-      );
-      setEmployeeDetails(response.data);
-    } else {
-      const response = await axios.get<Criminal>(
-        `${process.env.REACT_APP_BASE_URL}/api/Person/GetCriminalById?Id=${personId}`
-      );
-      setCriminalDetails(response.data);
+      if (personDetails?.personType === "Employee") {
+        const response = await axios.get<Employee>(
+          `${process.env.REACT_APP_BASE_URL}/api/Person/GetEmployeeById?Id=${personId}`
+        );
+        setEmployeeDetails(response.data);
+      } else {
+        const response = await axios.get<Criminal>(
+          `${process.env.REACT_APP_BASE_URL}/api/Person/GetCriminalById?Id=${personId}`
+        );
+        setCriminalDetails(response.data);
+      }
+    } catch {
+      toast.error("Error");
     }
   };
 

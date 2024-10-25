@@ -14,7 +14,7 @@ const Login: React.FC = () => {
     e.preventDefault();
 
     // Hardcoded credentials
-    const hardcodedEmail = "user@dtc.com";
+    const hardcodedEmail = "user@unifynow.ai";
     const hardcodedPassword = "Test@123";
 
     if (email === hardcodedEmail && password === hardcodedPassword) {
