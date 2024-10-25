@@ -9,9 +9,10 @@ interface Alert {
   name: string;
   location: string;
   camera: string;
+  id: string;
 }
 
-const Alert = () => {
+const AlertComponent = () => {
   const [alerts, setAlerts] = useState<Alert[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
 
@@ -34,8 +35,20 @@ const Alert = () => {
     }
   };
 
-  const markAsFalse = () => {
-    console.log("hi");
+  const markAsFalse = async (id: string) => {
+    try {
+      setLoading(true);
+
+      const response = await axios.post(
+        `${process.env.REACT_APP_BASE_URL}/api/Person/PostAlertAction?id=${id}`
+      );
+      console.log(response.data);
+      fetchAlerts();
+    } catch (error) {
+      toast.error("Failed to mark as fasle");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -92,6 +105,7 @@ const Alert = () => {
               <th>Location</th>
               <th>Camera Name</th>
               <th>Action</th>
+              <th style={{ display: "none" }}>Id</th>
             </tr>
 
             {alerts.map((alert) => {
@@ -124,8 +138,11 @@ const Alert = () => {
                   <td>{alert.location}</td>
                   <td>{alert.camera}</td>
                   <td>
-                    <button onClick={markAsFalse}>Mark as False</button>
+                    <button onClick={() => markAsFalse(alert.id)}>
+                      Mark as False
+                    </button>
                   </td>
+                  <td style={{ display: "none" }}>{alert.id}</td>
                 </tr>
               );
             })}
@@ -136,4 +153,4 @@ const Alert = () => {
   );
 };
 
-export default Alert;
+export default AlertComponent;
