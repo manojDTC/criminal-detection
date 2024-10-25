@@ -178,6 +178,8 @@ const TimeLine = () => {
         );
         setCriminalDetails(response.data);
       }
+
+      fetchTimeline(fromDate, toDate, personId);
     } catch {
       toast.error("Error");
     }

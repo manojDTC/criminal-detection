@@ -85,7 +85,7 @@ const History = () => {
         cameraId: camera,
         fromDate: Fdate,
         todate: Tdate,
-        type: selectedPersonType,
+        type: type,
       };
 
       const response = await axios.post<History[]>(

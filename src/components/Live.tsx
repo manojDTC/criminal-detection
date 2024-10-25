@@ -408,6 +408,7 @@ const Live = () => {
               >
                 <option value="Criminal">Criminal</option>
                 <option value="VIP">VIP</option>
+                <option value="Employee">Employee</option>
               </select>
               <div style={{ height: "250px", overflow: "scroll" }}>
                 <table className="dbtable criminaltable">

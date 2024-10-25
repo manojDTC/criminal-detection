@@ -44,7 +44,7 @@ interface Criminal {
 }
 
 const InitialEmployee = {
-  id: "",
+  id: "00000000-0000-0000-0000-000000000000",
   name: "",
   gender: "male",
   personType: "Employee",
@@ -52,20 +52,20 @@ const InitialEmployee = {
   code: "",
   email: "",
   contactNo: "",
-  language: "en",
+  language: "English",
   country: "usa",
   images: [],
 };
 
 const InitialCriminal = {
-  id: "",
+  id: "00000000-0000-0000-0000-000000000000",
   name: "",
   gender: "male",
   personType: "Criminal",
   code: "",
   email: "",
   contactNo: "",
-  language: "en",
+  language: "English",
   country: "usa",
   issuedBy: "CBI",
   poc: "",
@@ -627,11 +627,11 @@ const EmployeeDB = () => {
                 value={formData.language}
                 onChange={handleInputChange}
               >
-                <option value="en">English</option>
-                <option value="fr">French</option>
-                <option value="es">Spanish</option>
-                <option value="de">German</option>
-                <option value="zh">Chinese</option>
+                <option value="English">English</option>
+                <option value="French">French</option>
+                <option value="Spanish">Spanish</option>
+                <option value="German">German</option>
+                <option value="Chinese">Chinese</option>
               </select>
             </div>
             <div>
@@ -732,7 +732,7 @@ const EmployeeDB = () => {
               </div>
 
               <div>
-                <label htmlFor="language">Gender:</label>
+                <label htmlFor="gender">Gender:</label>
                 <select
                   id="gender"
                   name="gender"
@@ -745,7 +745,7 @@ const EmployeeDB = () => {
               </div>
 
               <div>
-                <label htmlFor="language">Issued By:</label>
+                <label htmlFor="issuedBy">Issued By:</label>
                 <select
                   id="issuedBy"
                   name="issuedBy"
@@ -764,7 +764,7 @@ const EmployeeDB = () => {
               </div>
 
               <div>
-                <label htmlFor="employeeId">POC:</label>
+                <label htmlFor="poc">POC:</label>
                 <input
                   type="text"
                   id="poc"
@@ -774,7 +774,7 @@ const EmployeeDB = () => {
                 />
               </div>
               <div>
-                <label htmlFor="language">Origin City:</label>
+                <label htmlFor="originCity">Origin City:</label>
                 <select
                   id="originCity"
                   name="originCity"
@@ -808,11 +808,11 @@ const EmployeeDB = () => {
                     value={formDataCriminal.language}
                     onChange={handleInputChangeCrime}
                   >
-                    <option value="en">English</option>
-                    <option value="fr">French</option>
-                    <option value="es">Spanish</option>
-                    <option value="de">German</option>
-                    <option value="zh">Chinese</option>
+                    <option value="English">English</option>
+                    <option value="French">French</option>
+                    <option value="Spanish">Spanish</option>
+                    <option value="German">German</option>
+                    <option value="Chinese">Chinese</option>
                   </select>
                 </div>
                 <div style={{ flex: "0 0 48%" }}>
