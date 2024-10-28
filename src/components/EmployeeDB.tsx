@@ -97,16 +97,17 @@ const EmployeeDB = () => {
     for (let i = 0; i < files.length; i++) {
       formData.append("Images", files[i]); // Append all files under "Images" key
     }
+    formData.append("PersonId", personId);
 
     const totalSize = Array.from(files).reduce(
       (acc, file) => acc + file.size,
       0
     );
-    let cumulativeLoaded = 0;
+
     setUploading(true);
     try {
       await axios.post(
-        `${process.env.REACT_APP_BASE_URL}/api/Person/AddImage/` + personId,
+        `${process.env.REACT_APP_BASE_URL}/api/Person/AddImage`,
         formData,
         {
           onUploadProgress: (progressEvent) => {
@@ -123,6 +124,9 @@ const EmployeeDB = () => {
           },
         }
       );
+      fetchEmployees();
+      fetchCriminals();
+      toast.success("Images Added Successfully");
     } catch (error) {
       toast.error("Error uploading images");
       console.error("Error uploading images:", error);
@@ -132,35 +136,34 @@ const EmployeeDB = () => {
       event.target.value = ""; // Clear the input field
     }
   };
+  const fetchEmployees = async () => {
+    try {
+      const response = await axios.get<Employee[]>(
+        `${process.env.REACT_APP_BASE_URL}/api/Person/GetEmployeesImages`
+      );
+      setEmployees(response.data);
+    } catch (error) {
+      toast.error("Failed to load employees");
+    } finally {
+      setLoading(false);
+    }
+  };
 
+  const fetchCriminals = async () => {
+    try {
+      const response = await axios.get<Criminal[]>(
+        `${process.env.REACT_APP_BASE_URL}/api/Person/GetCriminalsImages`
+      );
+      setCriminal(response.data);
+    } catch (error) {
+      toast.error("Failed to load criminals");
+      setError("Failed to load criminals");
+    } finally {
+      setLoading(false);
+    }
+  };
   useEffect(() => {
-    const fetchEmployees = async () => {
-      try {
-        const response = await axios.get<Employee[]>(
-          `${process.env.REACT_APP_BASE_URL}/api/Person/GetEmployeesImages`
-        );
-        setEmployees(response.data);
-      } catch (error) {
-        toast.error("Failed to load employees");
-      } finally {
-        setLoading(false);
-      }
-    };
     fetchEmployees();
-
-    const fetchCriminals = async () => {
-      try {
-        const response = await axios.get<Criminal[]>(
-          `${process.env.REACT_APP_BASE_URL}/api/Person/GetCriminalsImages`
-        );
-        setCriminal(response.data);
-      } catch (error) {
-        toast.error("Failed to load criminals");
-        setError("Failed to load criminals");
-      } finally {
-        setLoading(false);
-      }
-    };
 
     if (key === "1") {
       fetchEmployees();
@@ -232,6 +235,8 @@ const EmployeeDB = () => {
 
         toast.success("Employee Added Successfully");
         setFormData(InitialEmployee);
+        setIsOpen(false);
+        fetchEmployees();
       } catch (error: any) {
         toast.error("Failed to add employee");
       } finally {
@@ -283,6 +288,8 @@ const EmployeeDB = () => {
 
         toast.success("Criminal Record Added Successfully");
         setFormDataCriminal(InitialCriminal); // Reset the criminal form data
+        setIsOpen(false);
+        fetchCriminals();
       } catch (error: any) {
         toast.error("Failed to add criminal record");
       } finally {
@@ -870,8 +877,14 @@ const EmployeeDB = () => {
         ""
       )}
       {uploading && (
-        <div className="modal">
-          <div className="modal-content">
+        <div className="modal formmodal">
+          <div
+            className="modal-content formmodal-content"
+            style={{
+              overflowY: "scroll",
+              padding: "15px",
+            }}
+          >
             <div>
               Uploading&emsp;
               <div
