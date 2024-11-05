@@ -1,3 +1,4 @@
+/* eslint-disable eqeqeq */
 import React, { useEffect, useState } from "react";
 import Tabs from "rc-tabs";
 import "rc-tabs/assets/index.css";
@@ -43,33 +44,68 @@ interface Criminal {
   images: ImageDetails[];
 }
 
+export const personType = [
+  "Resident",
+  "Guest",
+  "Delivery Agent",
+  "Domestic Help",
+  "Employee",
+  "Black List",
+];
+
 const InitialEmployee = {
   id: "00000000-0000-0000-0000-000000000000",
   name: "",
   gender: "male",
-  personType: "Employee",
+  personType: "",
   role: "",
   code: "",
   email: "",
   contactNo: "",
-  language: "English",
-  country: "usa",
+  language: "",
+  country: "india",
   images: [],
 };
+
+export const cities = [
+  "Jaipur ",
+  "Surat",
+  " Pune",
+  " Ahmedabad",
+  " Hyderabad ",
+  "Bangalore",
+  " Chennai ",
+  "Kolkata",
+  "Mumbai",
+];
+
+export const languages = [
+  "Hindi",
+  "Bengali",
+  "Telugu",
+  "Marathi",
+  "Tamil",
+  "Gujarati",
+  "Kannada",
+  "Malayalam",
+  "Odia",
+  "Punjabi",
+  "English",
+];
 
 const InitialCriminal = {
   id: "00000000-0000-0000-0000-000000000000",
   name: "",
   gender: "male",
-  personType: "Criminal",
+  personType: "Black List",
   code: "",
   email: "",
   contactNo: "",
-  language: "English",
-  country: "usa",
+  language: "",
+  country: "india",
   issuedBy: "CBI",
   poc: "",
-  originCity: "Chicago",
+  originCity: "",
   crime: "",
   images: [],
 };
@@ -156,8 +192,8 @@ const EmployeeDB = () => {
       );
       setCriminal(response.data);
     } catch (error) {
-      toast.error("Failed to load criminals");
-      setError("Failed to load criminals");
+      toast.error("Failed to load Blacklist");
+      setError("Failed to load Blacklist");
     } finally {
       setLoading(false);
     }
@@ -233,12 +269,12 @@ const EmployeeDB = () => {
           }
         );
 
-        toast.success("Employee Added Successfully");
+        toast.success("Person Added Successfully");
         setFormData(InitialEmployee);
         setIsOpen(false);
         fetchEmployees();
       } catch (error: any) {
-        toast.error("Failed to add employee");
+        toast.error("Failed to add Person");
       } finally {
         setLoading(false);
       }
@@ -250,7 +286,7 @@ const EmployeeDB = () => {
     const errors = [];
 
     // Validate criminal form data
-    if (formDataCriminal.name === "") errors.push("Criminal Name is required.");
+    if (formDataCriminal.name === "") errors.push("Name is required.");
     if (formDataCriminal.gender === "") errors.push("Gender is required.");
     if (formDataCriminal.personType === "")
       errors.push("Person Type is required.");
@@ -286,12 +322,12 @@ const EmployeeDB = () => {
           }
         );
 
-        toast.success("Criminal Record Added Successfully");
+        toast.success("Blacklist Record Added Successfully");
         setFormDataCriminal(InitialCriminal); // Reset the criminal form data
         setIsOpen(false);
         fetchCriminals();
       } catch (error: any) {
-        toast.error("Failed to add criminal record");
+        toast.error("Failed to add Blacklist record");
       } finally {
         setLoading(false);
       }
@@ -301,7 +337,7 @@ const EmployeeDB = () => {
   const items = [
     {
       key: "1",
-      label: <p style={{ fontSize: "16px" }}>Employee List</p>,
+      label: <p style={{ fontSize: "16px" }}>Person List</p>,
       children: (
         <div className="text-xl">
           {loading ? (
@@ -315,9 +351,8 @@ const EmployeeDB = () => {
                   <tr>
                     <th>Name</th>
                     <th>Gender</th>
-                    <th>Employee Id</th>
+                    <th> Id</th>
                     <th>Role</th>
-                    {/* <th>Camera Name</th> */}
                     <th>Total Images</th>
                     <th>Actions</th>
                   </tr>
@@ -388,9 +423,7 @@ const EmployeeDB = () => {
     },
     {
       key: "2",
-      label: (
-        <p style={{ marginLeft: "10px", fontSize: "16px" }}>Criminal List</p>
-      ),
+      label: <p style={{ marginLeft: "10px", fontSize: "16px" }}>Blaklists</p>,
       children: (
         <div>
           {loading ? (
@@ -508,7 +541,7 @@ const EmployeeDB = () => {
               }}
               onClick={openModal}
             >
-              Add Employee
+              Add Person
             </button>
           </>
         ) : (
@@ -526,7 +559,7 @@ const EmployeeDB = () => {
               }}
               onClick={openModal}
             >
-              Add Criminal
+              Add Blacklist
             </button>
           </>
         )}
@@ -547,7 +580,7 @@ const EmployeeDB = () => {
             <span className="close" onClick={closeModal}>
               &times;
             </span>
-            <h2>Add Employee</h2>
+            <h2>Add Person</h2>
 
             <div>
               <label htmlFor="name">Name:</label>
@@ -580,7 +613,7 @@ const EmployeeDB = () => {
               />
             </div>
             <div>
-              <label htmlFor="employeeId">Employee ID:</label>
+              <label htmlFor="employeeId">ID:</label>
               <input
                 type="text"
                 id="employeeId"
@@ -600,7 +633,7 @@ const EmployeeDB = () => {
               />
             </div>
 
-            {/* <div>
+            <div>
               <label htmlFor="language">Person Type:</label>
               <select
                 id="personType"
@@ -608,11 +641,12 @@ const EmployeeDB = () => {
                 value={formData.personType}
                 onChange={handleInputChange}
               >
-                <option value="Employee">Employee</option>
-                <option value="VIP">VIP</option>
-                <option value="Criminal">Criminal</option>
+                <option value="">Select person type</option>
+                {[...personType].sort().map((person) => (
+                  <option value={person}>{person}</option>
+                ))}
               </select>
-            </div> */}
+            </div>
 
             <div>
               <label htmlFor="language">Gender:</label>
@@ -634,26 +668,10 @@ const EmployeeDB = () => {
                 value={formData.language}
                 onChange={handleInputChange}
               >
-                <option value="English">English</option>
-                <option value="French">French</option>
-                <option value="Spanish">Spanish</option>
-                <option value="German">German</option>
-                <option value="Chinese">Chinese</option>
-              </select>
-            </div>
-            <div>
-              <label htmlFor="country">Country:</label>
-              <select
-                id="country"
-                name="country"
-                value={formData.country}
-                onChange={handleInputChange}
-              >
-                <option value="usa">United States</option>
-                <option value="canada">Canada</option>
-                <option value="uk">United Kingdom</option>
-                <option value="australia">Australia</option>
-                <option value="india">India</option>
+                <option value="English">Select a language</option>
+                {[...languages].sort().map((langs) => (
+                  <option value={langs}>{langs}</option>
+                ))}
               </select>
             </div>
 
@@ -694,7 +712,7 @@ const EmployeeDB = () => {
                 &times;
               </span>
               <h2 style={{ margin: "5px 0", fontSize: "20px" }}>
-                Add Criminal
+                Add Blacklist
               </h2>
 
               <div>
@@ -718,7 +736,7 @@ const EmployeeDB = () => {
                 />
               </div>
               <div>
-                <label htmlFor="criminalId">Criminal Id:</label>
+                <label htmlFor="criminalId"> Id:</label>
                 <input
                   type="text"
                   id="criminalId"
@@ -788,14 +806,19 @@ const EmployeeDB = () => {
                   value={formDataCriminal.originCity}
                   onChange={handleInputChangeCrime}
                 >
-                  <option value="Chicago">Chicago</option>
-                  <option value="Detroit">Detroit</option>
-                  <option value="Oakland">Oakland</option>
-                  <option value="Cleveland">Cleveland</option>
+                  <option value="">Select a City</option>
+                  {[...cities]
+                    .map((city) => city.trim())
+                    .sort((a, b) => a.localeCompare(b))
+                    .map((city) => (
+                      <option key={city} value={city}>
+                        {city}
+                      </option>
+                    ))}
                 </select>
               </div>
               <div>
-                <label htmlFor="employeeId">Crime:</label>
+                <label htmlFor="employeeId">Reason:</label>
                 <input
                   type="text"
                   id="crime"
@@ -804,54 +827,21 @@ const EmployeeDB = () => {
                   name="crime"
                 />
               </div>
-              <div style={{ display: "flex", gap: "30px" }}>
-                <div style={{ flex: "0 0 48%" }}>
-                  <label htmlFor="language" style={{ width: "90px" }}>
-                    Language:
-                  </label>
-                  <select
-                    id="language"
-                    name="language"
-                    value={formDataCriminal.language}
-                    onChange={handleInputChangeCrime}
-                  >
-                    <option value="English">English</option>
-                    <option value="French">French</option>
-                    <option value="Spanish">Spanish</option>
-                    <option value="German">German</option>
-                    <option value="Chinese">Chinese</option>
-                  </select>
-                </div>
-                <div style={{ flex: "0 0 48%" }}>
-                  <label htmlFor="country" style={{ width: "90px" }}>
-                    Country:
-                  </label>
-                  <select
-                    id="country"
-                    name="country"
-                    value={formDataCriminal.country}
-                    onChange={handleInputChangeCrime}
-                  >
-                    <option value="usa">United States</option>
-                    <option value="canada">Canada</option>
-                    <option value="uk">United Kingdom</option>
-                    <option value="australia">Australia</option>
-                    <option value="india">India</option>
-                  </select>
-                </div>
+              <div>
+                <label htmlFor="language">Language:</label>
+                <select
+                  id="language"
+                  name="language"
+                  value={formDataCriminal.language}
+                  onChange={handleInputChangeCrime}
+                >
+                  <option value="English">Select a language</option>
+                  {[...languages].sort().map((langs) => (
+                    <option value={langs}>{langs}</option>
+                  ))}
+                </select>
               </div>
-              {/* <div>
-              <label htmlFor="photo">Photo:</label>
-              <input
-                type="file"
-                id="photo"
-                name="photo"
-                accept=".png , .jpg , jpeg"
-                multiple
-                value={formData.ph}
-                onChange={handleInputChange}
-              />
-            </div> */}
+
               <div style={{ justifyContent: "right" }}>
                 <button
                   // type="submit"

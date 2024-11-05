@@ -8,6 +8,7 @@ import { toast } from "react-toastify";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import axios from "axios";
+import { personType } from "./EmployeeDB";
 
 interface History {
   imageUrl: string;
@@ -34,7 +35,7 @@ const History = () => {
   const [toDate, setToDate] = useState<Date>(new Date());
   const [cameraList, setCameraList] = useState<Camera[]>([]);
   const [selectedCamera, setSelectedCamera] = useState("");
-  const [personType, setPersonType] = useState<string[]>([]);
+  // const [personType, setPersonType] = useState<string[]>([]);
   const [selectedPersonType, setSelectedPersonType] = useState<string>("");
 
   // Handle start date selection
@@ -120,22 +121,22 @@ const History = () => {
 
     fetchCameraList();
 
-    const fetchPersonTypes = async () => {
-      setLoading(true);
-      try {
-        const response = await axios.get<string[]>(
-          `${process.env.REACT_APP_BASE_URL}/api/Person/GetPersonTypes`
-        );
-        setPersonType(response.data);
-        setLoading(false);
-      } catch (error) {
-        toast.error("Failed to load Persontype");
-      } finally {
-        setLoading(false);
-      }
-    };
+    // const fetchPersonTypes = async () => {
+    //   setLoading(true);
+    //   try {
+    //     const response = await axios.get<string[]>(
+    //       `${process.env.REACT_APP_BASE_URL}/api/Person/GetPersonTypes`
+    //     );
+    //     // setPersonType(response.data);
+    //     setLoading(false);
+    //   } catch (error) {
+    //     toast.error("Failed to load Persontype");
+    //   } finally {
+    //     setLoading(false);
+    //   }
+    // };
 
-    fetchPersonTypes();
+    // fetchPersonTypes();
   }, []);
 
   const getSelectedCamera = async (
