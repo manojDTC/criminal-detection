@@ -8,6 +8,7 @@ import axios from "axios";
 import { toast } from "react-toastify";
 import star from "../assets/start.png";
 import tick from "../assets/tick.png";
+import { personType } from "./EmployeeDB";
 
 interface Camera {
   id: string;
@@ -83,7 +84,7 @@ const Live = () => {
   const [liveDetectionList, setLiveDetectionList] = useState<
     LiveDetection[] | null
   >(null);
-  const [selectedType, setSelectedType] = useState<string>("");
+  const [selectedType, setSelectedType] = useState<string>("Employee");
   const [criminalDetectionList, setCriminalDetectionList] = useState<
     LiveDetection[] | null
   >(null);
@@ -97,11 +98,21 @@ const Live = () => {
   const [criminalDetails, setCriminalDetails] = useState<Criminal | null>(null);
   const [selectedPersonDetails, setSelectedPersonDetails] = useState("");
 
-  const selectedTypeRef = useRef(selectedType);
-
   useEffect(() => {
-    selectedTypeRef.current = selectedType;
-  }, [selectedType]);
+    if (selectedCamera === "") {
+      fetchCriminalDetections();
+    } else {
+      // Set intervals for fetching data
+      const intervalId = setInterval(fetchCriminalDetections, 5000);
+      const intervalIds = setInterval(fetchLiveDetections, 5000);
+
+      // Clear both intervals when the component unmounts or dependencies change
+      return () => {
+        clearInterval(intervalId);
+        clearInterval(intervalIds);
+      };
+    }
+  }, [selectedType, selectedCamera]);
 
   useEffect(() => {
     const fetchCameraList = async () => {
@@ -130,7 +141,7 @@ const Live = () => {
     const camera = cameraLists.find((camera) => camera.id === cameraId);
     setSelectedCameraDetails(camera);
     setSelectedCamera(cameraId);
-    setSelectedType("Criminal");
+    setSelectedType("Employee");
     setLiveDetectionList([]);
     setCriminalDetectionList([]);
 
@@ -142,18 +153,11 @@ const Live = () => {
     } catch (error) {
       toast.error("Failed to fetch live feed");
     }
-
-    const intervalId = setInterval(fetchLiveDetections, 5000);
-    const criminalIntervalId = setInterval(fetchCriminalDetections, 5000);
-    return () => {
-      clearInterval(intervalId);
-      clearInterval(criminalIntervalId);
-    };
   };
 
   const getSelectedType = (event: React.ChangeEvent<HTMLSelectElement>) => {
     setSelectedType(event.target.value);
-    fetchCriminalDetections();
+    // fetchCriminalDetections();
   };
 
   const fetchLiveDetections = async () => {
@@ -169,10 +173,10 @@ const Live = () => {
   };
 
   const fetchCriminalDetections = async () => {
-    const type1 = selectedTypeRef.current;
+    // const type1 = selectedTypeRef.current;
     try {
       const response = await axios.get<LiveDetection[]>(
-        `${process.env.REACT_APP_BASE_URL}/api/Person/GetDetection?Type=${type1}`
+        `${process.env.REACT_APP_BASE_URL}/api/Person/GetDetection?Type=${selectedType}`
       );
 
       setCriminalDetectionList(response.data);
@@ -406,9 +410,10 @@ const Live = () => {
                 onChange={getSelectedType}
                 value={selectedType}
               >
-                <option value="Criminal">Criminal</option>
-                <option value="VIP">VIP</option>
-                <option value="Employee">Employee</option>
+                <option value="">Select person type</option>
+                {[...personType].sort().map((person) => (
+                  <option value={person}>{person}</option>
+                ))}
               </select>
               <div style={{ height: "250px", overflow: "scroll" }}>
                 <table className="dbtable criminaltable">
